@@ -11,6 +11,7 @@
         android:layout_width="221dp"
         android:layout_height="72dp"
         android:layout_marginTop="112dp"
+        android:onClick="StartGameButton"
         android:text="Jugar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
