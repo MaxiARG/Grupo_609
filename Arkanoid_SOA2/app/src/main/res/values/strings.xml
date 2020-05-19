@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Arkanoid_SOA</string>
+
+    <string name="usuario">Ingrese Nombre de Usuario</string>
+    <string name="password">Ingrese su Contraseña</string>
+    <string name="ingresar">Ingresar</string>
+    <string name="registrarse">Primera vez que ingresa? Registrese</string>
+</resources>

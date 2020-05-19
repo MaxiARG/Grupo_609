@@ -1,0 +1,2 @@
+rootProject.name='Arkanoid_SOA'
+include ':app'

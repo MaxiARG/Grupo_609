@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainMenu_Activity">
+
+    <Button
+        android:id="@+id/button_Jugar"
+        android:layout_width="221dp"
+        android:layout_height="72dp"
+        android:layout_marginTop="112dp"
+        android:text="Jugar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/Button_Salir"
+        android:layout_width="221dp"
+        android:layout_height="72dp"
+        android:layout_marginTop="52dp"
+        android:text="Salir"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_Jugar" />
+
+    <Button
+        android:id="@+id/Button_Logs"
+        android:layout_width="166dp"
+        android:layout_height="43dp"
+        android:layout_marginTop="248dp"
+        android:text="Logs"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Button_Salir" />
+</androidx.constraintlayout.widget.ConstraintLayout>
