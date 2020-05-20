@@ -214,6 +214,11 @@ public class GameLoop extends AppCompatActivity {
                 ball.stepBackDX();
                 ball.invertirDX();
             }
+            if(Rect.intersects(paddle.getRect(), ball.getRect())){
+                System.out.println("Colision detectada en DX Paddle");
+                ball.stepBackDX();
+                ball.invertirDX();
+            }
 
             ball.stepDY();
             if(ball.getRect().top<0 || ball.getRect().bottom > screenY + 10 ){
@@ -222,6 +227,11 @@ public class GameLoop extends AppCompatActivity {
             }
             if(Rect.intersects(testRect, ball.getRect())){
                 System.out.println("Colision detectada en DY");
+                ball.stepBackDY();
+                ball.invertirDY();
+            }
+            if(Rect.intersects(paddle.getRect(), ball.getRect())){
+                System.out.println("Colision detectada en DY Paddle");
                 ball.stepBackDY();
                 ball.invertirDY();
             }
