@@ -1,25 +1,17 @@
 package com.example.Business;
 
-import android.graphics.RectF;
+import android.graphics.Rect;
 
 public class Paddle {
 
-    // Guarda 4 coordenadas
-    private RectF rect;
+    private Rect rect;
+    private int dx = 6;
 
-    private float length;
-    private float height;
+    private int ancho;
+    private int alto;
+    private int left;
+    private int top;
 
-    //Coord del lado izquierdo del Paddle
-    private float x;
-
-    // Coord de arriba del Paddle
-    private float y;
-
-    // En pixeles por segundo
-    private float paddleSpeed;
-
-    // Indica las direcciones de movimiento
     public final int STOPPED = 0;
     public final int LEFT = 1;
     public final int RIGHT = 2;
@@ -29,45 +21,28 @@ public class Paddle {
 
     public Paddle(int screenX, int screenY){
         // Tam en pixeles del Paddle
-        length = 130;
-        height = 20;
-
-
-        // Pone la posicion en el medio
-        //x = screenX / 2;
-       // y = screenY - 20;
-        x = 500;
-        y = 1400;
-
-        //Con esto se hacen las colisiones
-        rect = new RectF(x, y, x + length, y + height);
-
-        paddleSpeed = 350;
+        ancho = 130;
+        alto = 20;
+        left = 500;
+        top = 1400;
+       // Rect(int left, int top, int right, int bottom)
+        rect = new Rect(left, top, left + ancho, top + alto);
     }
 
-    //Lo voy a llamar desde la clase GameLoop
-    public RectF getRect(){
+    public Rect getRect(){
         return rect;
     }
 
-    //Cambia en que dir se mueve
     public void setMovementState(int state){
         paddleMoving = state;
     }
 
-    //Mover y actualizar rec, llamado desde GameLoop
-    public void update(float deltaTime){
+    public void update(){
 
-        if(paddleMoving == LEFT){
-            x = x - paddleSpeed * deltaTime;
-        }
-
-        if(paddleMoving == RIGHT){
-            x = x + paddleSpeed * deltaTime;
-        }
-
-        rect.left = x;
-        rect.right = x + length;
-       // System.out.println(rect.left+" "+rect.right+" "+x);
+        if(paddleMoving == LEFT) left = left - dx;
+        if(paddleMoving == RIGHT) left = left + dx;
+        rect.left = left;
+        rect.right = left + ancho;
     }
+
 }

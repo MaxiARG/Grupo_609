@@ -1,84 +1,70 @@
 package com.example.Business;
 
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.RectF;
 
 import java.util.Random;
 
 public class Ball {
 
-    RectF rect;
-    float xVelocity=1f;
-    float yVelocity=-1f;
+    Rect rect;//sirve para ver colisiones
 
-    float ballWidth = 40;
-    float ballHeight = 40;
+    //float vX =1f;
+   // float vY =-1f;
+
+    int dx = 6; //cuantos pixeles se mueve por tick.
+    int dy = 5;
+
+    int ancho = 40;
+    int alto = 40;
+    int left = 500;
+    int top = 1370;
 
     public Ball(int screenX, int screenY){
+        //Rect(int left, int top, int right, int bottom)
+        rect = rect = new Rect(left,top, left + ancho, top + alto);
 
-        // Start the ball travelling straight up at 100 pixels per second
-        xVelocity = 200;
-        yVelocity = -400;
-        //xVelocity = 500f;
-        //yVelocity = -500f;
-
-        // Place the ball in the centre of the screen at the bottom
-        // Make it a 10 pixel x 10 pixel square
-        rect = rect = new RectF(500, 1370, 500 + ballWidth, 1370 + ballHeight);
-
-    }
-
-    public void update(float deltaTime){
-        System.out.println("DELTA ES: "+ deltaTime);
-        rect.left = rect.left + (xVelocity * deltaTime);
-        rect.top = rect.top + (yVelocity * deltaTime);
-        rect.right = rect.left + ballWidth;
-        rect.bottom = rect.top - ballHeight;
-        System.out.println(xVelocity+" "+yVelocity);
-        System.out.println(rect.left +" "+rect.right);
-    }
-
-    public void reverseYVelocity(){
-        yVelocity = -yVelocity;
-    }
-
-    public void reverseXVelocity(){
-        xVelocity = - xVelocity;
-    }
-
-    public void setRandomXVelocity(){
-        Random generator = new Random();
-        int answer = generator.nextInt(2);
-
-        if(answer == 0){
-            reverseXVelocity();
-        }
-         //xVelocity=500;
-        // yVelocity=-500;
-    }
-
-    public void clearObstacleY(float y){
-        rect.bottom = y;
-        rect.top = y - ballHeight;
-    }
-
-    public void clearObstacleX(float x){
-        rect.left = x;
-        rect.right = x + ballWidth;
     }
 
     public void reset(int x, int y){
-       // rect.left = x / 2;
-     //   rect.top = y - 20;
-        rect.left = 500;//esto seria posicion X e Y.
-        rect.top = 1370;
-      //  rect.right = x / 2 + ballWidth;
-        //rect.bottom = y - 20 - ballHeight;
-        rect.right = 500 + ballWidth;
-        rect.bottom = 1370 - ballHeight;
+        rect.left = left;//esto seria posicion X e Y.
+        rect.top = top;
+        rect.right = left + ancho;
+        rect.bottom = top - alto; //aca deberia ser + ???
     }
 
-    public RectF getRect(){
+    public Rect getRect(){
         return rect;
     }
 
+    public void stepDX(){
+        rect.left = rect.left + dx;
+        rect.right = rect.left + ancho;
+    }
+    public void stepDY(){
+        rect.top = rect.top + dy;
+        rect.bottom = rect.top + alto;
+    }
+    public void stepBackDX(){
+        rect.left = rect.left - dx;
+        rect.right = rect.left + ancho;
+    }
+
+    public void stepBackDY(){
+        rect.top = rect.top - dy;
+        rect.bottom = rect.top + alto;
+    }
+
+    public void invertirDX(){
+        dx = -dx;
+    }
+    public void invertirDY(){
+        dy = -dy;
+    }
+
+    public void randomizeDY(){
+        Random generator = new Random();
+        dy = -(generator.nextInt(5)+2);
+    }
 }

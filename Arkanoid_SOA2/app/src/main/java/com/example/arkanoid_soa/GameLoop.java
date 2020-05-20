@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -49,6 +50,8 @@ public class GameLoop extends AppCompatActivity {
     }
 
     class BreakoutView extends SurfaceView implements Runnable {
+        //Rect(int left, int top, int right, int bottom)
+        Rect testRect = new Rect(10,1100,1200,1180);
 
         Thread gameThread = null;
         SurfaceHolder ourHolder;
@@ -103,7 +106,7 @@ public class GameLoop extends AppCompatActivity {
             running = true;
 
             cargarSonidos(context);
-            createBricksAndRestart();
+          //  createBricksAndRestart();
         }
 
         private void cargarSonidos(Context context) {
@@ -179,7 +182,7 @@ public class GameLoop extends AppCompatActivity {
                 draw();
 
                 if (System.currentTimeMillis() - timer > 1000) {
-                    System.out.println(String.format("FPS: %s", frames));
+                    //System.out.println(String.format("FPS: %s", frames));
                     frames = 0;
                     ticks = 0;
                     timer += 1000;
@@ -190,77 +193,96 @@ public class GameLoop extends AppCompatActivity {
 
 
         public void update(float deltaTime) {
-            paddle.update(deltaTime);
-            ball.update(deltaTime);
+            paddle.update();
+            //ball.update(deltaTime);
 
-            colisionConBricks();
+          //  colisionConBricks();
 
-            colisionConPaddle();
+           // colisionConPaddle();
 
-            colisionContraPiso();
+          //  colisionContraPiso();
 
-            colisionParedes();
+           // colisionParedes();
+
+            ball.stepDX();
+            if(ball.getRect().left<0 || ball.getRect().right > screenX ){
+                ball.stepBackDX();
+                ball.invertirDX();
+            }
+            if(Rect.intersects(testRect, ball.getRect())){
+                System.out.println("Colision detectada en DX");
+                ball.stepBackDX();
+                ball.invertirDX();
+            }
+
+            ball.stepDY();
+            if(ball.getRect().top<0 || ball.getRect().bottom > screenY + 10 ){
+                ball.stepBackDY();
+                ball.invertirDY();
+            }
+            if(Rect.intersects(testRect, ball.getRect())){
+                System.out.println("Colision detectada en DY");
+                ball.stepBackDY();
+                ball.invertirDY();
+            }
+
 
             // Pause if cleared screen
-            if(score == numBricks * 10){ //VERIFICAR ESE NUMERO!
+           /* if(score == numBricks * 10){ //VERIFICAR ESE NUMERO!
                 paused = true;
                 createBricksAndRestart();
-            }
+            }*/
         }
 
-        private void colisionParedes() {
+      /*  private void colisionParedes() {
             // Bounce the ball back when it hits the top of screen
             if(ball.getRect().top < 0){
-                ball.reverseYVelocity();
+                ball.invertirVelocidadY();
                 ball.clearObstacleY(12);
-                soundPool.play(beep2ID, 1, 1, 0, 0, 1);
+              //  soundPool.play(beep2ID, 1, 1, 0, 0, 1);
             }
 
             // If the ball hits left wall bounce
             if(ball.getRect().left < 0){
-                ball.reverseXVelocity();
+                ball.invertirVelocidadX();
                 ball.clearObstacleX(2);
-                soundPool.play(beep3ID, 1, 1, 0, 0, 1);
+               // soundPool.play(beep3ID, 1, 1, 0, 0, 1);
             }
 
             // If the ball hits right wall bounce
             if(ball.getRect().right > screenX - 10){
-                ball.reverseXVelocity();
+                ball.invertirVelocidadX();
                 ball.clearObstacleX(screenX - 22);
-                soundPool.play(beep3ID, 1, 1, 0, 0, 1);
+              //  soundPool.play(beep3ID, 1, 1, 0, 0, 1);
             }
-        }
+        }*/
 
-        private void colisionContraPiso() {
-            // Bounce the ball back when it hits the bottom of screen
-            // And deduct a life
+        /*private void colisionContraPiso() {
             if(ball.getRect().bottom > screenY){
-                ball.reverseYVelocity();
+                ball.invertirVelocidadY();
                 ball.clearObstacleY(screenY - 2);
-
-                // Lose a life
-                lives --;
+               // lives --;
                 // soundPool.play(loseLifeID, 1, 1, 0, 0, 1);
 
                 if(lives == 0){
                     paused = true;
-                    createBricksAndRestart();
+                   // createBricksAndRestart();
                 }
 
             }
-        }
+        }*/
 
-        private void colisionConPaddle() {
+        /*private void colisionConPaddle() {
             // Check for ball colliding with paddle
             if(RectF.intersects(paddle.getRect(),ball.getRect())) {
                 ball.setRandomXVelocity();
-                ball.reverseYVelocity();
+                ball.invertirVelocidadY();
                 ball.clearObstacleY(paddle.getRect().top - 2);
-                soundPool.play(beep1ID, 1, 1, 0, 0, 1);
+             //   soundPool.play(beep1ID, 1, 1, 0, 0, 1);
             }
-        }
+        }*/
 
-        private void colisionConBricks() {
+       /* private void colisionConBricks() {
             // Check for ball colliding with a brick
             for(int i = 0; i < numBricks; i++){
 
@@ -268,13 +290,13 @@ public class GameLoop extends AppCompatActivity {
 
                     if(RectF.intersects(bricks[i].getRect(),ball.getRect())) {
                         bricks[i].setInvisible();
-                        ball.reverseYVelocity();
+                        ball.invertirVelocidadY();
                         score = score + 10;
                         //soundPool.play(explodeID, 1, 1, 0, 0, 1);
                     }
                 }
             }
-        }
+        }*/
 
         public void draw() {
 
@@ -285,44 +307,81 @@ public class GameLoop extends AppCompatActivity {
                 paint.setColor(Color.argb(255,  255, 255, 255));
 
                 canvas.drawRect(paddle.getRect(), paint);
-
-
                 canvas.drawRect(ball.getRect(), paint);
 
-                paint.setColor(Color.argb(255,  123, 212, 111));
+                canvas.drawRect(testRect, paint);
 
-                for(int i = 0; i < numBricks; i++){
-                    if(bricks[i].getVisibility()) {
-
-                        canvas.drawRect(bricks[i].getRect(), paint);
-                    }
-                }
-
-
-                // Draw the HUD
-                // Choose the brush color for drawing
-                paint.setColor(Color.argb(255,  255, 255, 255));
-
-                // Draw the score
-                paint.setTextSize(40);
-                canvas.drawText("Score: " + score + "   Lives: " + lives, 10,50, paint);
-
-                // Has the player cleared the screen?
-                if(score == numBricks * 10){
-                    paint.setTextSize(90);
-                    canvas.drawText("YOU HAVE WON!", 10,screenY/2, paint);
-                }
-
-                // Has the player lost?
-                if(lives <= 0){
-                    paint.setTextSize(90);
-                    canvas.drawText("YOU HAVE LOST!", 10,screenY/2, paint);
-                }
-
+                //dibujarBricks();
+                dibujarScore();
+                dibujarCondicionDeVictoria();
 
                 ourHolder.unlockCanvasAndPost(canvas);
             }
 
+        }
+
+        private void dibujarCondicionDeVictoria() {
+            // Has the player cleared the screen?
+            if(score == numBricks * 10){
+               // paint.setTextSize(90);
+               // canvas.drawText("YOU HAVE WON!", 10,screenY/2, paint);
+            }
+
+            // Has the player lost?
+            if(lives <= 0){
+              //  paint.setTextSize(90);
+               // canvas.drawText("YOU HAVE LOST!", 10,screenY/2, paint);
+            }
+        }
+        public boolean col(Rect a, Rect b){
+
+            if(a.left < b.left + b.width() &&
+                    a.left + a.width() > b.left &&
+                    a.top < b.top + b.height() &&
+                    a.top + a.height() > b.top)
+            {
+                System.out.println("Collision Detected");
+                return true;
+            }
+            //System.out.println("NOOOOOOOOOOO Collision Detected");
+            return false;
+        }
+        public boolean intersectan(Rect a, Rect b) {
+            if(a.left > (b.left+ b.width())) {
+                return false;
+            }
+            if(a.left+a.width() < b.left) {
+                return false;
+            }
+            if(a.top > (b.top + b.height())) {
+                return false;
+            }
+            if(a.top+a.height() < b.top){
+                return false;
+            }
+            return true;
+        }
+
+
+        private void dibujarScore() {
+            // Draw the HUD
+            // Choose the brush color for drawing
+            paint.setColor(Color.argb(255,  255, 255, 255));
+
+            // Draw the score
+            paint.setTextSize(40);
+            canvas.drawText("Score: " + score + "   Lives: " + lives, 10,50, paint);
+        }
+
+        private void dibujarBricks() {
+            paint.setColor(Color.argb(255,  123, 212, 111));
+
+            for(int i = 0; i < numBricks; i++){
+                if(bricks[i].getVisibility()) {
+
+                    canvas.drawRect(bricks[i].getRect(), paint);
+                }
+            }
         }
 
         // If SimpleGameEngine Activity is paused/stopped
@@ -346,32 +405,22 @@ public class GameLoop extends AppCompatActivity {
             gameThread.start();
         }
 
-        // The SurfaceView class implements onTouchListener
-        // So we can override this method and detect screen touches.
         @Override
         public boolean onTouchEvent(MotionEvent motionEvent) {
 
            // switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             switch (motionEvent.getActionMasked()) {
-                // Player has touched the screen
                 case MotionEvent.ACTION_DOWN:
-
                     paused = false;
-                    //System.out.println("DOWNNNNNNNNNNNNNNN");
                     if(motionEvent.getX() > screenX / 2){
                         paddle.setMovementState(paddle.RIGHT);
-                        System.out.println(motionEvent.getX()+" "+motionEvent.getY());
                     }
                     else{
                         paddle.setMovementState(paddle.LEFT);
-                     //   System.out.println("LEFTTTTTTTTTTTTT");
                     }
 
                     break;
-
-                // Player has removed finger from screen
                 case MotionEvent.ACTION_UP:
-
                     paddle.setMovementState(paddle.STOPPED);
                     break;
             }
