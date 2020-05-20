@@ -61,12 +61,14 @@ public class GameLoop extends AppCompatActivity {
         int numBricks = 0;
         int brickWidth ;
         int brickHeight;
+
         SoundPool soundPool;
         int beep1ID = -1;
         int beep2ID = -1;
         int beep3ID = -1;
         int loseLifeID = -1;
         int explodeID = -1;
+
         int score = 0;
         int lives = 3;
 
@@ -81,6 +83,7 @@ public class GameLoop extends AppCompatActivity {
         Ball ball;
 
         public BreakoutView(Context context) {
+
             super(context);
             ourHolder = getHolder();
             paint = new Paint();
@@ -99,9 +102,11 @@ public class GameLoop extends AppCompatActivity {
 
             running = true;
 
-            //
-            // Load the sounds
+            cargarSonidos(context);
+            createBricksAndRestart();
+        }
 
+        private void cargarSonidos(Context context) {
             // This SoundPool is deprecated but don't worry
             soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC,0);
 
@@ -130,9 +135,8 @@ public class GameLoop extends AppCompatActivity {
                 // Print an error message to the console
                 Log.e("error", "failed to load sound files");
             }
-            //
-            createBricksAndRestart();
         }
+
         public void createBricksAndRestart(){
             ball.reset(screenX, screenY);
 
@@ -168,13 +172,11 @@ public class GameLoop extends AppCompatActivity {
                 initialTime = currentTime;
 
                 if (deltaF >= 1 && !paused) {
-                    update((float)deltaF/1000);
+                    update((float)deltaF/1000);//lo convierto a milisegundos
                     frames++;
                     deltaF--;
                 }
                 draw();
-
-
 
                 if (System.currentTimeMillis() - timer > 1000) {
                     System.out.println(String.format("FPS: %s", frames));
@@ -190,45 +192,23 @@ public class GameLoop extends AppCompatActivity {
         public void update(float deltaTime) {
             paddle.update(deltaTime);
             ball.update(deltaTime);
-            // Check for ball colliding with a brick
-            for(int i = 0; i < numBricks; i++){
 
-                if (bricks[i].getVisibility()){
+            colisionConBricks();
 
-                    if(RectF.intersects(bricks[i].getRect(),ball.getRect())) {
-                        bricks[i].setInvisible();
-                        ball.reverseYVelocity();
-                        score = score + 10;
-                        //soundPool.play(explodeID, 1, 1, 0, 0, 1);
-                    }
-                }
+            colisionConPaddle();
+
+            colisionContraPiso();
+
+            colisionParedes();
+
+            // Pause if cleared screen
+            if(score == numBricks * 10){ //VERIFICAR ESE NUMERO!
+                paused = true;
+                createBricksAndRestart();
             }
+        }
 
-            // Check for ball colliding with paddle
-            if(RectF.intersects(paddle.getRect(),ball.getRect())) {
-                ball.setRandomXVelocity();
-                ball.reverseYVelocity();
-                ball.clearObstacleY(paddle.getRect().top - 2);
-                soundPool.play(beep1ID, 1, 1, 0, 0, 1);
-            }
-
-            // Bounce the ball back when it hits the bottom of screen
-            // And deduct a life
-            if(ball.getRect().bottom > screenY){
-                ball.reverseYVelocity();
-                ball.clearObstacleY(screenY - 2);
-
-                // Lose a life
-                lives --;
-                // soundPool.play(loseLifeID, 1, 1, 0, 0, 1);
-
-                if(lives == 0){
-                    paused = true;
-                    createBricksAndRestart();
-                }
-
-            }
-
+        private void colisionParedes() {
             // Bounce the ball back when it hits the top of screen
             if(ball.getRect().top < 0){
                 ball.reverseYVelocity();
@@ -249,11 +229,50 @@ public class GameLoop extends AppCompatActivity {
                 ball.clearObstacleX(screenX - 22);
                 soundPool.play(beep3ID, 1, 1, 0, 0, 1);
             }
+        }
 
-            // Pause if cleared screen
-            if(score == numBricks * 10){ //VERIFICAR ESE NUMERO!
-                paused = true;
-                createBricksAndRestart();
+        private void colisionContraPiso() {
+            // Bounce the ball back when it hits the bottom of screen
+            // And deduct a life
+            if(ball.getRect().bottom > screenY){
+                ball.reverseYVelocity();
+                ball.clearObstacleY(screenY - 2);
+
+                // Lose a life
+                lives --;
+                // soundPool.play(loseLifeID, 1, 1, 0, 0, 1);
+
+                if(lives == 0){
+                    paused = true;
+                    createBricksAndRestart();
+                }
+
+            }
+        }
+
+        private void colisionConPaddle() {
+            // Check for ball colliding with paddle
+            if(RectF.intersects(paddle.getRect(),ball.getRect())) {
+                ball.setRandomXVelocity();
+                ball.reverseYVelocity();
+                ball.clearObstacleY(paddle.getRect().top - 2);
+                soundPool.play(beep1ID, 1, 1, 0, 0, 1);
+            }
+        }
+
+        private void colisionConBricks() {
+            // Check for ball colliding with a brick
+            for(int i = 0; i < numBricks; i++){
+
+                if (bricks[i].getVisibility()){
+
+                    if(RectF.intersects(bricks[i].getRect(),ball.getRect())) {
+                        bricks[i].setInvisible();
+                        ball.reverseYVelocity();
+                        score = score + 10;
+                        //soundPool.play(explodeID, 1, 1, 0, 0, 1);
+                    }
+                }
             }
         }
 

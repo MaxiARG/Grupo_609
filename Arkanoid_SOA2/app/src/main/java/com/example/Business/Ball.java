@@ -16,19 +16,16 @@ public class Ball {
     public Ball(int screenX, int screenY){
 
         // Start the ball travelling straight up at 100 pixels per second
-       // xVelocity = 200;
-       // yVelocity = -400;
-        xVelocity = 500f;
-        yVelocity = -500f;
+        xVelocity = 200;
+        yVelocity = -400;
+        //xVelocity = 500f;
+        //yVelocity = -500f;
 
         // Place the ball in the centre of the screen at the bottom
         // Make it a 10 pixel x 10 pixel square
         rect = rect = new RectF(500, 1370, 500 + ballWidth, 1370 + ballHeight);
-        //rect = new RectF();
 
     }
-
-
 
     public void update(float deltaTime){
         System.out.println("DELTA ES: "+ deltaTime);
