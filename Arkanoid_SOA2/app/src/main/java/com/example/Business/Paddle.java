@@ -56,14 +56,14 @@ public class Paddle {
     }
 
     //Mover y actualizar rec, llamado desde GameLoop
-    public void update(long fps){
+    public void update(float deltaTime){
 
         if(paddleMoving == LEFT){
-            x = x - paddleSpeed / fps;
+            x = x - paddleSpeed * deltaTime;
         }
 
         if(paddleMoving == RIGHT){
-            x = x + paddleSpeed / fps;
+            x = x + paddleSpeed * deltaTime;
         }
 
         rect.left = x;

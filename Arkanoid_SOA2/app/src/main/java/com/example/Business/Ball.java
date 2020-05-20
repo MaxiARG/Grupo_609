@@ -7,8 +7,8 @@ import java.util.Random;
 public class Ball {
 
     RectF rect;
-    float xVelocity=15;
-    float yVelocity=-2;
+    float xVelocity=1f;
+    float yVelocity=-1f;
 
     float ballWidth = 40;
     float ballHeight = 40;
@@ -18,8 +18,8 @@ public class Ball {
         // Start the ball travelling straight up at 100 pixels per second
        // xVelocity = 200;
        // yVelocity = -400;
-        xVelocity = 1;
-        yVelocity = -1;
+        xVelocity = 500f;
+        yVelocity = -500f;
 
         // Place the ball in the centre of the screen at the bottom
         // Make it a 10 pixel x 10 pixel square
@@ -30,16 +30,14 @@ public class Ball {
 
 
 
-    public void update(long fps){
-        rect.left = rect.left + (xVelocity / fps);
-        rect.top = rect.top + (yVelocity / fps);
+    public void update(float deltaTime){
+        System.out.println("DELTA ES: "+ deltaTime);
+        rect.left = rect.left + (xVelocity * deltaTime);
+        rect.top = rect.top + (yVelocity * deltaTime);
         rect.right = rect.left + ballWidth;
         rect.bottom = rect.top - ballHeight;
         System.out.println(xVelocity+" "+yVelocity);
         System.out.println(rect.left +" "+rect.right);
-
-
-
     }
 
     public void reverseYVelocity(){
@@ -57,8 +55,8 @@ public class Ball {
         if(answer == 0){
             reverseXVelocity();
         }*/
-         xVelocity=15;
-         yVelocity=-2;
+         xVelocity=500;
+         yVelocity=-500;
     }
 
     public void clearObstacleY(float y){

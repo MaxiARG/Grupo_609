@@ -15,6 +15,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.example.Business.Ball;
+import com.example.Business.Brick;
 import com.example.Business.Paddle;
 
 public class GameLoop extends AppCompatActivity {
@@ -44,10 +45,17 @@ public class GameLoop extends AppCompatActivity {
 
         Thread gameThread = null;
         SurfaceHolder ourHolder;
-        volatile boolean playing = true;
+        volatile boolean running = true;
         boolean paused = true;
         Canvas canvas;
         Paint paint;
+        //
+        Brick[] bricks = new Brick[200];
+        int numBricks = 0;
+        int brickWidth ;
+        int brickHeight;
+
+        //
         long fps;
         private long timeThisFrame;
         // The size of the screen in pixels
@@ -69,47 +77,69 @@ public class GameLoop extends AppCompatActivity {
 
             screenX = size.x;
             screenY = size.y;
+            //
+
+            //
 
             //los param son para ubicar los dibujos en la pantalla
             paddle = new Paddle(screenX, screenY);
             ball = new Ball(screenX, screenY);
 
 
-            playing = true;
+            running = true;
             createBricksAndRestart();
         }
         public void createBricksAndRestart(){
             ball.reset(screenX, screenY);
+
+            brickWidth = screenX / 8;
+            brickHeight = screenY / 30;
+            numBricks = 0;
+
+            for(int column = 0; column < 8; column ++ ){
+                for(int row = 0; row < 12; row ++ ){
+                    bricks[numBricks] = new Brick(row, column, brickWidth, brickHeight);
+                    numBricks ++;
+                }
+            }
         }
 
         @Override
         public void run() {
-          //  System.out.println("Run de GameLoop fuera del While");
-            while (playing) {
-                //System.out.println("Run de GameLoop DENTRO del While");
-                long startFrameTime = System.currentTimeMillis();
 
-                if(!paused){
-                //    System.out.println("NO PAUSADO");
-                    update();
+            long initialTime = System.nanoTime();
+            final double timeF = 1000000000 / 60;
+            double  deltaF = 0;
+            int frames = 0, ticks = 0;
+            long timer = System.currentTimeMillis();
 
+            while (running) {
+
+                long currentTime = System.nanoTime();
+                deltaF += (currentTime - initialTime) / timeF;
+                initialTime = currentTime;
+
+                if (deltaF >= 1 && !paused) {
+                    update((float)deltaF/1000);
+                    frames++;
+                    deltaF--;
                 }
-               // System.out.println("Fuera");
                 draw();
 
-                timeThisFrame = System.currentTimeMillis() - startFrameTime;
-                if (timeThisFrame >= 1)
-                    fps = 1000 / timeThisFrame;
-
-
+                if (System.currentTimeMillis() - timer > 1000) {
+                    System.out.println(String.format("FPS: %s", frames));
+                    frames = 0;
+                    ticks = 0;
+                    timer += 1000;
+                }
             }
 
         }
 
 
-        public void update() {
-            paddle.update(fps);
-            ball.update(fps);
+        public void update(float deltaTime) {
+            paddle.update(deltaTime);
+            ball.update(deltaTime);
         }
 
         public void draw() {
@@ -132,7 +162,16 @@ public class GameLoop extends AppCompatActivity {
                 canvas.drawRect(ball.getRect(), paint);
 
                 // Draw the bricks
+                // Change the brush color for drawing
 
+                paint.setColor(Color.argb(255,  123, 212, 111));
+                // Draw the bricks if visible
+                for(int i = 0; i < numBricks; i++){
+                    if(bricks[i].getVisibility()) {
+
+                        canvas.drawRect(bricks[i].getRect(), paint);
+                    }
+                }
                 // Draw the HUD
 
 
@@ -144,7 +183,7 @@ public class GameLoop extends AppCompatActivity {
         // If SimpleGameEngine Activity is paused/stopped
         // shutdown our thread.
         public void pause() {
-            playing = false;
+            running = false;
             try {
                 gameThread.join();
             } catch (InterruptedException e) {
@@ -157,7 +196,7 @@ public class GameLoop extends AppCompatActivity {
         // start our thread.
         public void resume() {
             paused = false;
-            playing = true;
+            running = true;
             gameThread = new Thread(this);
             gameThread.start();
         }
