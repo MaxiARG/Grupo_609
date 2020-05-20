@@ -32,9 +32,12 @@ public class Paddle {
         length = 130;
         height = 20;
 
+
         // Pone la posicion en el medio
-        x = screenX / 2;
-        y = screenY - 20;
+        //x = screenX / 2;
+       // y = screenY - 20;
+        x = 500;
+        y = 1400;
 
         //Con esto se hacen las colisiones
         rect = new RectF(x, y, x + length, y + height);
@@ -54,6 +57,7 @@ public class Paddle {
 
     //Mover y actualizar rec, llamado desde GameLoop
     public void update(long fps){
+
         if(paddleMoving == LEFT){
             x = x - paddleSpeed / fps;
         }
@@ -64,5 +68,6 @@ public class Paddle {
 
         rect.left = x;
         rect.right = x + length;
+       // System.out.println(rect.left+" "+rect.right+" "+x);
     }
 }

@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.example.Business.Ball;
 import com.example.Business.Paddle;
 
 public class GameLoop extends AppCompatActivity {
@@ -52,7 +53,9 @@ public class GameLoop extends AppCompatActivity {
         // The size of the screen in pixels
         int screenX;
         int screenY;
+
         Paddle paddle;
+        Ball ball;
 
         public BreakoutView(Context context) {
             super(context);
@@ -67,24 +70,36 @@ public class GameLoop extends AppCompatActivity {
             screenX = size.x;
             screenY = size.y;
 
+            //los param son para ubicar los dibujos en la pantalla
             paddle = new Paddle(screenX, screenY);
+            ball = new Ball(screenX, screenY);
+
+
+            playing = true;
+            createBricksAndRestart();
+        }
+        public void createBricksAndRestart(){
+            ball.reset(screenX, screenY);
         }
 
         @Override
         public void run() {
-
+          //  System.out.println("Run de GameLoop fuera del While");
             while (playing) {
+                //System.out.println("Run de GameLoop DENTRO del While");
                 long startFrameTime = System.currentTimeMillis();
 
                 if(!paused){
+                //    System.out.println("NO PAUSADO");
                     update();
-                    paddle.update(fps);
-                }
 
+                }
+               // System.out.println("Fuera");
                 draw();
 
                 timeThisFrame = System.currentTimeMillis() - startFrameTime;
-                if (timeThisFrame >= 1) fps = 1000 / timeThisFrame;
+                if (timeThisFrame >= 1)
+                    fps = 1000 / timeThisFrame;
 
 
             }
@@ -93,10 +108,12 @@ public class GameLoop extends AppCompatActivity {
 
 
         public void update() {
-            System.out.print("Loop del Juego");
+            paddle.update(fps);
+            ball.update(fps);
         }
 
         public void draw() {
+         //   System.out.println("DRAW");
 
             if (ourHolder.getSurface().isValid()) {
                 canvas = ourHolder.lockCanvas();
@@ -109,7 +126,10 @@ public class GameLoop extends AppCompatActivity {
                 // Draw the paddle
                 canvas.drawRect(paddle.getRect(), paint);
 
+
                 // Draw the ball
+
+                canvas.drawRect(ball.getRect(), paint);
 
                 // Draw the bricks
 
@@ -136,6 +156,7 @@ public class GameLoop extends AppCompatActivity {
         // If SimpleGameEngine Activity is started then
         // start our thread.
         public void resume() {
+            paused = false;
             playing = true;
             gameThread = new Thread(this);
             gameThread.start();
@@ -151,15 +172,15 @@ public class GameLoop extends AppCompatActivity {
                 // Player has touched the screen
                 case MotionEvent.ACTION_DOWN:
 
-                   // paused = false;
-                    System.out.println("DOWNNNNNNNNNNNNNNN");
+                    paused = false;
+                    //System.out.println("DOWNNNNNNNNNNNNNNN");
                     if(motionEvent.getX() > screenX / 2){
                         paddle.setMovementState(paddle.RIGHT);
-                        System.out.println("RIGHTTTTTTTTTTTTT");
+                        System.out.println(motionEvent.getX()+" "+motionEvent.getY());
                     }
                     else{
                         paddle.setMovementState(paddle.LEFT);
-                        System.out.println("LEFTTTTTTTTTTTTT");
+                     //   System.out.println("LEFTTTTTTTTTTTTT");
                     }
 
                     break;
