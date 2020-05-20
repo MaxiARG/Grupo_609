@@ -49,14 +49,14 @@ public class Ball {
     }
 
     public void setRandomXVelocity(){
-       /* Random generator = new Random();
+        Random generator = new Random();
         int answer = generator.nextInt(2);
 
         if(answer == 0){
             reverseXVelocity();
-        }*/
-         xVelocity=500;
-         yVelocity=-500;
+        }
+         //xVelocity=500;
+        // yVelocity=-500;
     }
 
     public void clearObstacleY(float y){
