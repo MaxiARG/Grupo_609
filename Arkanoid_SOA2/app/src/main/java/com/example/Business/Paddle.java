@@ -23,7 +23,6 @@ public class Paddle {
     int posInicialX;
     int posInicialY;
 
-
     public Paddle(int screenX, int screenY){
         // Tam en pixeles del Paddle
         ancho = 130;
@@ -39,8 +38,6 @@ public class Paddle {
         top = posInicialY;
 
         rect = rect = new Rect(posInicialX,posInicialY, posInicialX + ancho, posInicialY + alto);
-       // Rect(int left, int top, int right, int bottom)
-       // rect = new Rect(left, top, left + ancho, top + alto);
     }
 
     public void resetPosition(){
