@@ -33,16 +33,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText4" />
 
-    <Button
-        android:id="@+id/button_salir"
-        android:layout_width="175dp"
-        android:layout_height="95dp"
-        android:layout_marginTop="48dp"
-        android:onClick="salir"
-        android:text="Salir"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_volverMenu" />
 </androidx.constraintlayout.widget.ConstraintLayout>

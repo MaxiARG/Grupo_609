@@ -22,10 +22,6 @@ public class MainMenu_Activity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void salir(View view){
-        Toast.makeText(this,"Falta implementar",Toast.LENGTH_LONG).show();
-    }
-
     public void verLogs(View view){
         Toast.makeText(this,"Falta implementar",Toast.LENGTH_LONG).show();
     }

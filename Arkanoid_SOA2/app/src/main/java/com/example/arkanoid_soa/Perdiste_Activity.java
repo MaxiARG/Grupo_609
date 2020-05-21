@@ -20,10 +20,6 @@ public class Perdiste_Activity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void salir(View view){
-        Toast.makeText(this,"Falta implementar",Toast.LENGTH_LONG).show();
-    }
-
     @Override
     public void onBackPressed() {
         return;
