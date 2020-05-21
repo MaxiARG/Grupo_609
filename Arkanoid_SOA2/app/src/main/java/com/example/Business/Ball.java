@@ -4,6 +4,8 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+import androidx.core.math.MathUtils;
+
 import java.util.Random;
 
 public class Ball {
@@ -19,17 +21,27 @@ public class Ball {
     int left = 500;
     int top = 1270;
 
+    int screenWidth;
+    int screenHeight;
+    int posInicialX;
+    int posInicialY;
+
     public Ball(int screenX, int screenY){
         //Rect(int left, int top, int right, int bottom)
-        rect = rect = new Rect(left,top, left + ancho, top + alto);
+        screenHeight=screenY;
+        screenWidth = screenX;
+        posInicialX = Math.round(screenWidth * 0.5f);;
+        posInicialY = Math.round(screenHeight * 0.7f);
+        rect = rect = new Rect(posInicialX,posInicialY, posInicialX + ancho, posInicialY + alto);
 
     }
 
-    public void reset(int x, int y){
-        rect.left = left;//esto seria posicion X e Y.
-        rect.top = top;
-        rect.right = left + ancho;
-        rect.bottom = top - alto; //aca deberia ser + ???
+    public void reset(){
+        dy = -5;
+        rect.left = posInicialX;
+        rect.top = posInicialY;
+        rect.right = posInicialX + ancho;
+        rect.bottom = posInicialY + alto;
     }
 
     public Rect getRect(){

@@ -1,9 +1,10 @@
 package com.example.Business;
 
+import android.graphics.Rect;
 import android.graphics.RectF;
 
 public class Brick {
-    private RectF rect;
+    private Rect rect;
 
     private boolean isVisible;
 
@@ -13,13 +14,11 @@ public class Brick {
 
         int padding = 2;
 
-        rect = new RectF(column * width + padding,
-                row * height + padding,
-                column * width + width - padding,
-                row * height + height - padding);
+        rect = new Rect(column * width + padding, row * height + padding,
+                column * width + width - padding, row * height + height - padding);
     }
 
-    public RectF getRect(){
+    public Rect getRect(){
         return this.rect;
     }
 

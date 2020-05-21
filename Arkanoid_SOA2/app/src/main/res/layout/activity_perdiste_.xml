@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Perdiste_Activity">
+
+    <EditText
+        android:id="@+id/editText7"
+        android:layout_width="181dp"
+        android:layout_height="76dp"
+        android:layout_marginTop="228dp"
+        android:editable="false"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="PERDISTE!"
+        android:textSize="36sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_VolverMenu"
+        android:layout_width="234dp"
+        android:layout_height="86dp"
+        android:layout_marginTop="64dp"
+        android:onClick="A_MenuPrincipal"
+        android:text="Volver Al Menu"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText7" />
+
+    <Button
+        android:id="@+id/button_salir"
+        android:layout_width="198dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="52dp"
+        android:onClick="salir"
+        android:text="Salir"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button_VolverMenu" />
+</androidx.constraintlayout.widget.ConstraintLayout>

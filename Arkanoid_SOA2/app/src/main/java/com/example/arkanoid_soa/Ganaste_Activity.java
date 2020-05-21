@@ -6,22 +6,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-public class MainActivity extends AppCompatActivity {
+public class Ganaste_Activity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_ganaste_);
     }
 
-    public void registrarse(View view){
-        Intent intent = new Intent(this, Registrarse_Activity.class);
-        startActivity(intent);
-    }
 
-    public void ingresar(View view){
+    public void A_MenuPrincipal(View view){
         Intent intent = new Intent(this, MainMenu_Activity.class);
         startActivity(intent);
+    }
+
+    public void salir(View view){
+        System.out.println("Elegist SALIR");
     }
 
 }

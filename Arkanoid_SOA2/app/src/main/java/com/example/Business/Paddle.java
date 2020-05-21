@@ -18,15 +18,42 @@ public class Paddle {
 
     private int paddleMoving = STOPPED;
 
+    int screenWidth;
+    int screenHeight;
+    int posInicialX;
+    int posInicialY;
+
 
     public Paddle(int screenX, int screenY){
         // Tam en pixeles del Paddle
         ancho = 130;
         alto = 20;
-        left = 500;
-        top = 1400;
+        screenHeight=screenY;
+        screenWidth = screenX;
+        //0.5 es el 50% del ancho de la pantalla
+        //0.8 es el 80% del alto. Ambos para posicionar el paddle bien
+        posInicialX = Math.round(screenWidth * 0.5f - ancho/2);;
+        posInicialY = Math.round(screenHeight * 0.8f);
+
+        left = posInicialX;
+        top = posInicialY;
+
+        rect = rect = new Rect(posInicialX,posInicialY, posInicialX + ancho, posInicialY + alto);
        // Rect(int left, int top, int right, int bottom)
-        rect = new Rect(left, top, left + ancho, top + alto);
+       // rect = new Rect(left, top, left + ancho, top + alto);
+    }
+
+    public void resetPosition(){
+        posInicialX = Math.round(screenWidth * 0.5f - ancho/2);;
+        posInicialY = Math.round(screenHeight * 0.8f);
+
+        left = posInicialX;
+        top = posInicialY;
+
+        rect.left = posInicialX;
+        rect.right = posInicialX + ancho;
+        rect.top = posInicialY;
+        rect.bottom = posInicialY + alto;
     }
 
     public Rect getRect(){
