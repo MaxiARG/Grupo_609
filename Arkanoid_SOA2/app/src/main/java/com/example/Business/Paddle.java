@@ -65,9 +65,8 @@ public class Paddle {
     }
 
     public void update(){
-
-        if(paddleMoving == LEFT) left = left - dx;
-        if(paddleMoving == RIGHT) left = left + dx;
+        if(paddleMoving == LEFT && left > 0 ) left = left - dx;
+        if(paddleMoving == RIGHT && (left+ancho) < screenWidth) left = left + dx;
         rect.left = left;
         rect.right = left + ancho;
     }

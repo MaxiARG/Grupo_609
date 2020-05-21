@@ -12,8 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="76dp"
         android:ems="10"
+        android:hint="usuario"
         android:inputType="textPersonName"
-        android:text="Name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -22,10 +22,10 @@
         android:id="@+id/editText5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="92dp"
+        android:layout_marginTop="64dp"
         android:ems="10"
+        android:hint="contraseña"
         android:inputType="textPersonName"
-        android:text="Name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText6" />
@@ -36,30 +36,32 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
         android:ems="10"
+        android:hint="mail"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText3" />
 
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/button_registrarse"
         android:layout_width="217dp"
         android:layout_height="56dp"
-        android:layout_marginTop="60dp"
-        android:text="Button"
+        android:layout_marginTop="64dp"
+        android:onClick="solicitarRegistro"
+        android:text="Registrarse"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.51"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText5" />
 
     <TextView
         android:id="@+id/textView"
-        android:layout_width="322dp"
-        android:layout_height="33dp"
+        android:layout_width="190dp"
+        android:layout_height="39dp"
         android:layout_marginTop="44dp"
-        android:text="TextView"
+        android:editable="false"
+        android:text="Barra para mostrar resultado"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button3" />
+        app:layout_constraintTop_toBottomOf="@+id/button_registrarse" />
 </androidx.constraintlayout.widget.ConstraintLayout>

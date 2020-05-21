@@ -10,10 +10,12 @@
         android:id="@+id/button_Jugar"
         android:layout_width="221dp"
         android:layout_height="72dp"
-        android:layout_marginTop="112dp"
+        android:layout_marginTop="252dp"
         android:onClick="StartGameButton"
         android:text="Jugar"
+        android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.452"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -21,9 +23,12 @@
         android:id="@+id/Button_Salir"
         android:layout_width="221dp"
         android:layout_height="72dp"
-        android:layout_marginTop="52dp"
+        android:layout_marginTop="76dp"
+        android:onClick="salir"
         android:text="Salir"
+        android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.452"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button_Jugar" />
 
@@ -31,10 +36,12 @@
         android:id="@+id/Button_Logs"
         android:layout_width="166dp"
         android:layout_height="43dp"
-        android:layout_marginTop="248dp"
+        android:layout_marginTop="92dp"
+        android:onClick="verLogs"
         android:text="Logs"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.461"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Button_Salir" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainMenu_Activity extends AppCompatActivity {
 
@@ -18,7 +19,20 @@ public class MainMenu_Activity extends AppCompatActivity {
 
     public void StartGameButton(View view){
         Intent intent = new Intent(this, GameLoop.class);
-        System.out.println("StartGameButton Llamado");
         startActivity(intent);
+    }
+
+    public void salir(View view){
+        Toast.makeText(this,"Falta implementar",Toast.LENGTH_LONG).show();
+    }
+
+    public void verLogs(View view){
+        Toast.makeText(this,"Falta implementar",Toast.LENGTH_LONG).show();
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        return;
     }
 }

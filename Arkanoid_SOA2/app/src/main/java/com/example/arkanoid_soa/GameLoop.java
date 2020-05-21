@@ -17,6 +17,7 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 import com.example.Business.Ball;
 import com.example.Business.Brick;
@@ -287,6 +288,7 @@ public class GameLoop extends AppCompatActivity {
             }
 
         }
+
         private void dibujarCondicionDeVictoria() {
 
             if(score == numBricks * 10){
@@ -303,14 +305,11 @@ public class GameLoop extends AppCompatActivity {
     }
 
         private void dibujarScore() {
-            // Draw the HUD
-            // Choose the brush color for drawing
             paint.setColor(Color.argb(255,  255, 255, 255));
-
-            // Draw the score
             paint.setTextSize(40);
             canvas.drawText("Score: " + score + "   Lives: " + lives, 10,50, paint);
         }
+
         public void pause() {
             running = false;
             try {
@@ -320,12 +319,14 @@ public class GameLoop extends AppCompatActivity {
             }
 
         }
+
         public void resume() {
             paused = false;
             running = true;
             gameThread = new Thread(this);
             gameThread.start();
         }
+
         @Override
         public boolean onTouchEvent(MotionEvent motionEvent) {
 
@@ -337,8 +338,6 @@ public class GameLoop extends AppCompatActivity {
                         paddle.setMovementState(paddle.RIGHT);
                     if(motionEvent.getX() < screenWidth / 2 && paused==false)
                         paddle.setMovementState(paddle.LEFT);
-
-
                     break;
                 case MotionEvent.ACTION_UP:
                     paddle.setMovementState(paddle.STOPPED);
@@ -346,5 +345,8 @@ public class GameLoop extends AppCompatActivity {
             }
             return true;
         }
+
+
     }
+
 }

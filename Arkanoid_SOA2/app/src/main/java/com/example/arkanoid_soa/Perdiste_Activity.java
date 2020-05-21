@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 public class Perdiste_Activity extends AppCompatActivity {
 
@@ -20,6 +21,11 @@ public class Perdiste_Activity extends AppCompatActivity {
     }
 
     public void salir(View view){
-        System.out.println("Elegist SALIR");
+        Toast.makeText(this,"Falta implementar",Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        return;
     }
 }

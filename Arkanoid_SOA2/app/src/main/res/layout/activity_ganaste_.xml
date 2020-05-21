@@ -11,6 +11,7 @@
         android:layout_width="177dp"
         android:layout_height="106dp"
         android:layout_marginTop="204dp"
+        android:editable="false"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="GANASTE!"
