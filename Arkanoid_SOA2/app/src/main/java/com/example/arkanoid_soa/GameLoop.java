@@ -51,7 +51,7 @@ public class GameLoop extends AppCompatActivity {
 
     class BreakoutView extends SurfaceView implements Runnable {
         //Rect(int left, int top, int right, int bottom)
-        Rect testRect = new Rect(10,1100,1200,1180);
+       // Rect testRect = new Rect(10,1100,1200,1180);
 
         Thread gameThread = null;
         SurfaceHolder ourHolder;
@@ -207,17 +207,13 @@ public class GameLoop extends AppCompatActivity {
             ball.stepDX();
             if(ball.getRect().left<0 || ball.getRect().right > screenX ){
                 ball.stepBackDX();
-                ball.invertirDX();
+
+               ball.invertirDX();
             }
-            if(Rect.intersects(testRect, ball.getRect())){
-                System.out.println("Colision detectada en DX");
-                ball.stepBackDX();
-                ball.invertirDX();
-            }
+
             if(Rect.intersects(paddle.getRect(), ball.getRect())){
-                System.out.println("Colision detectada en DX Paddle");
                 ball.stepBackDX();
-                ball.invertirDX();
+                ball.randomizeDY();
             }
 
             ball.stepDY();
@@ -225,15 +221,10 @@ public class GameLoop extends AppCompatActivity {
                 ball.stepBackDY();
                 ball.invertirDY();
             }
-            if(Rect.intersects(testRect, ball.getRect())){
-                System.out.println("Colision detectada en DY");
-                ball.stepBackDY();
-                ball.invertirDY();
-            }
+
             if(Rect.intersects(paddle.getRect(), ball.getRect())){
-                System.out.println("Colision detectada en DY Paddle");
                 ball.stepBackDY();
-                ball.invertirDY();
+                ball.randomizeDY();
             }
 
 
@@ -319,7 +310,7 @@ public class GameLoop extends AppCompatActivity {
                 canvas.drawRect(paddle.getRect(), paint);
                 canvas.drawRect(ball.getRect(), paint);
 
-                canvas.drawRect(testRect, paint);
+               // canvas.drawRect(testRect, paint);
 
                 //dibujarBricks();
                 dibujarScore();

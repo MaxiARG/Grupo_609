@@ -10,16 +10,14 @@ public class Ball {
 
     Rect rect;//sirve para ver colisiones
 
-    //float vX =1f;
-   // float vY =-1f;
-
     int dx = 6; //cuantos pixeles se mueve por tick.
-    int dy = 5;
-
+    int dy = -5;
+    // ancho NO es relativo a 'left'
+    // sino, es la coord global donde esta la anchura
     int ancho = 40;
     int alto = 40;
     int left = 500;
-    int top = 1370;
+    int top = 1270;
 
     public Ball(int screenX, int screenY){
         //Rect(int left, int top, int right, int bottom)
@@ -65,6 +63,9 @@ public class Ball {
 
     public void randomizeDY(){
         Random generator = new Random();
-        dy = -(generator.nextInt(5)+2);
+        dy = -dy;
+        if(dx>0) dx = (generator.nextInt(5)+2);
+        if(dx<0) dx = -(generator.nextInt(5)+2);
+
     }
 }
