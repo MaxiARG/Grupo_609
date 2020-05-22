@@ -10,6 +10,8 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.SoundPool;
@@ -27,16 +29,28 @@ import com.example.Business.Paddle;
 
 import java.io.IOException;
 
-public class GameLoop extends AppCompatActivity {
+public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
     BreakoutView breakoutView;
-
+    SensorManager sensorManager;
+    Sensor accelerometer;
+    float xSensor=0;
+    Point size;
+    Paddle paddle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         breakoutView = new BreakoutView(this);
         setContentView(breakoutView);
+
+        Display display = getWindowManager().getDefaultDisplay();
+        size = new Point();
+        display.getSize(size);
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(GameLoop.this, accelerometer, sensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
@@ -49,6 +63,25 @@ public class GameLoop extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         breakoutView.pause();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        System.out.println("X: "+event.values[0]);
+        float ventanaDeteccion = 1;
+        if( paddle != null && event.values[0] > 0.7f && paddle.getRect().left > 0){//inclinado a izquierda
+            paddle.setMovementState(paddle.LEFT);
+        }else
+        if( paddle != null && event.values[0] < -0.7f && (paddle.getRect().left+paddle.getRect().width()) < size.x){//inclinado a derecha
+            paddle.setMovementState(paddle.RIGHT);
+        }else {
+            paddle.setMovementState(paddle.STOPPED);
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 
     class BreakoutView extends SurfaceView implements Runnable {
@@ -87,7 +120,7 @@ public class GameLoop extends AppCompatActivity {
         int screenWidth;
         int screenHeight;
 
-        Paddle paddle;
+
         Ball ball;
 
         private SensorManager sensorManager;
@@ -190,7 +223,10 @@ public class GameLoop extends AppCompatActivity {
         }
 
 
+
+
         public void update(float deltaTime) {
+
             paddle.update();
 
             ball.stepDX();
@@ -341,14 +377,14 @@ public class GameLoop extends AppCompatActivity {
             switch (motionEvent.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     paused = false;
-                    if(motionEvent.getX() > screenWidth / 2 && paused==false)
-                        paddle.setMovementState(paddle.RIGHT);
-                    if(motionEvent.getX() < screenWidth / 2 && paused==false)
-                        paddle.setMovementState(paddle.LEFT);
-                    break;
-                case MotionEvent.ACTION_UP:
-                    paddle.setMovementState(paddle.STOPPED);
-                    break;
+                   // if(motionEvent.getX() > screenWidth / 2 && paused==false)
+                 //       paddle.setMovementState(paddle.RIGHT);
+                   // if(motionEvent.getX() < screenWidth / 2 && paused==false)
+                   //     paddle.setMovementState(paddle.LEFT);
+                   // break;
+             //   case MotionEvent.ACTION_UP:
+                   // paddle.setMovementState(paddle.STOPPED);
+                  //  break;
             }
             return true;
         }
