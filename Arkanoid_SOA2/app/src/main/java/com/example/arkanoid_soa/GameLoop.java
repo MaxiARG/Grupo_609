@@ -34,9 +34,8 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
     BreakoutView breakoutView;
     SensorManager sensorManager;
     Sensor accelerometer;
-    float xSensor=0;
     Point size;
-    Paddle paddle;
+    Paddle paddle=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +66,6 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        System.out.println("X: "+event.values[0]);
-        float ventanaDeteccion = 1;
         if( paddle != null && event.values[0] > 0.7f && paddle.getRect().left > 0){//inclinado a izquierda
             paddle.setMovementState(paddle.LEFT);
         }else
@@ -85,9 +82,6 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
     }
 
     class BreakoutView extends SurfaceView implements Runnable {
-        //Rect(int left, int top, int right, int bottom)
-       // Rect testRect = new Rect(10,1100,1200,1180);
-
         Thread gameThread = null;
         SurfaceHolder ourHolder;
         volatile boolean running = true;
@@ -95,7 +89,7 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
         Canvas canvas;
         Paint paint;
         //
-        Brick[] bricks = new Brick[200];
+        Brick[] bricks = new Brick[200];//cambiar esto por una matriz asi lo pinto mas facil?
         int numBricks = 0;
         int brickWidth ;
         int alturaDeCadaBrick=75;
@@ -113,8 +107,6 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
         int filas = 6;
         int columnas = 5;
 
-        //
-        long fps;
         private long timeThisFrame;
         // The size of the screen in pixels
         int screenWidth;
@@ -122,9 +114,6 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
 
         Ball ball;
-
-        private SensorManager sensorManager;
-        double ax,ay,az;
 
 
         public BreakoutView(Context context) {
@@ -160,10 +149,38 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
         }
 
         private void dibujarBricks() {
+            //El diseño y la forma de aparecer de estos ladrillos
+            //es particular de este nivel actual, 5 columnas y 6 filas
+            // Sin gap entre ladrillo y ladrillo. Se veran como una linea unica de ladrillos.
+            //como lo hacia la antigua Atari
             paint.setColor(Color.argb(255,  123, 212, 111));
             for(int i = 0; i < numBricks; i++){
                 if(bricks[i].getVisibility()) {
-                    canvas.drawRect(bricks[i].getRect(), paint);
+                    if(i>=0 && i < 5){
+                        paint.setColor(Color.argb(255,  204, 71, 72));
+                        canvas.drawRect(bricks[i].getRect(), paint);
+                    }
+                    if(i>=5&& i < 10){
+                        paint.setColor(Color.argb(255,  198, 108, 58));
+                        canvas.drawRect(bricks[i].getRect(), paint);
+                    }
+                    if(i>=10 && i < 15){
+                        paint.setColor(Color.argb(255,  180, 124, 47));
+                        canvas.drawRect(bricks[i].getRect(), paint);
+                    }
+                    if(i>=15 && i < 20){
+                        paint.setColor(Color.argb(255,  162, 162, 42));
+                        canvas.drawRect(bricks[i].getRect(), paint);
+                    }
+                    if(i>=20 && i < 25){
+                        paint.setColor(Color.argb(255,  69, 162, 73));
+                        canvas.drawRect(bricks[i].getRect(), paint);
+                    }
+                    if(i>=25 && i < 30){
+                        paint.setColor(Color.argb(255,  67, 72, 200));
+                        canvas.drawRect(bricks[i].getRect(), paint);
+                    }
+
                 }
             }
         }
@@ -317,9 +334,9 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
             if (ourHolder.getSurface().isValid()) {
                 canvas = ourHolder.lockCanvas();
 
-                canvas.drawColor(Color.argb(255,  26, 128, 182));
-                paint.setColor(Color.argb(255,  255, 255, 255));
+                canvas.drawColor(Color.argb(255,  0, 0, 0));//Fondo Negro
 
+                paint.setColor(Color.argb(255,  200, 70, 72));//Color rojo gastado de Atari
                 canvas.drawRect(paddle.getRect(), paint);
                 canvas.drawRect(ball.getRect(), paint);
 
@@ -372,19 +389,9 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
         @Override
         public boolean onTouchEvent(MotionEvent motionEvent) {
-
-           // switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             switch (motionEvent.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
                     paused = false;
-                   // if(motionEvent.getX() > screenWidth / 2 && paused==false)
-                 //       paddle.setMovementState(paddle.RIGHT);
-                   // if(motionEvent.getX() < screenWidth / 2 && paused==false)
-                   //     paddle.setMovementState(paddle.LEFT);
-                   // break;
-             //   case MotionEvent.ACTION_UP:
-                   // paddle.setMovementState(paddle.STOPPED);
-                  //  break;
             }
             return true;
         }
