@@ -33,9 +33,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void ingresar(View view){
-       // Intent intent = new Intent(this, MainMenu_Activity.class);
-        //startActivity(intent);
-        Retrofit retrofit;
+       Intent intent = new Intent(this, MainMenu_Activity.class);
+        startActivity(intent);
+       /* Retrofit retrofit;
         HttpLoggingInterceptor loggingInterceptor;
         Builder httpClientBuilder;
 
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("TAG1","ERROR: "+ t.getMessage());
             }
         });
-
+*/
 
 
     }
