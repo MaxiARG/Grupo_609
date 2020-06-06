@@ -7,21 +7,21 @@
     tools:context=".MainActivity">
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/inputPassword"
         android:layout_width="319dp"
         android:layout_height="62dp"
         android:layout_marginTop="76dp"
         android:ems="10"
-        android:hint="@string/password"
+        android:hint="Password"
         android:inputType="textPassword"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText2" />
+        app:layout_constraintTop_toBottomOf="@+id/inputEmail" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/buttonIngresar"
         android:layout_width="173dp"
         android:layout_height="68dp"
         android:layout_marginTop="40dp"
@@ -30,10 +30,10 @@
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText" />
+        app:layout_constraintTop_toBottomOf="@+id/inputPassword" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/ButtonRegistrarse"
         android:layout_width="333dp"
         android:layout_height="39dp"
         android:layout_marginTop="104dp"
@@ -43,15 +43,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+        app:layout_constraintTop_toBottomOf="@+id/buttonIngresar" />
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/inputEmail"
         android:layout_width="323dp"
         android:layout_height="75dp"
         android:layout_marginTop="84dp"
         android:ems="10"
-        android:hint="@string/usuario"
+        android:hint="Email"
         android:inputType="textPersonName"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"

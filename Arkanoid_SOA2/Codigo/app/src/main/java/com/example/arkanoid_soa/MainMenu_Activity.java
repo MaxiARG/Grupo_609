@@ -13,6 +13,7 @@ public class MainMenu_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu_);
+        Toast.makeText(this, "Conexion exitosa", Toast.LENGTH_LONG);
     }
 
 

@@ -3,14 +3,18 @@ package com.example.arkanoid_soa;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
-import com.example.servicios.Data;
-import com.example.servicios.ServicioLogin;
+import com.example.Business.Token;
+import com.example.servicios.Body_Login;
+import com.example.servicios.Respuesta_Webservice;
+import com.example.servicios.Webservice_UNLAM;
 
-import okhttp3.OkHttpClient;
 import okhttp3.OkHttpClient.Builder;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -33,40 +37,88 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void ingresar(View view){
-       Intent intent = new Intent(this, MainMenu_Activity.class);
-        startActivity(intent);
-       /* Retrofit retrofit;
+        boolean emailValidaOK = true;
+        boolean passwordValidaOK = true;
+        Retrofit retrofit;
         HttpLoggingInterceptor loggingInterceptor;
         Builder httpClientBuilder;
 
 
         loggingInterceptor = new HttpLoggingInterceptor()
-        .setLevel(HttpLoggingInterceptor.Level.BODY);
+                .setLevel(HttpLoggingInterceptor.Level.BODY);
+
         httpClientBuilder = new Builder().addInterceptor(loggingInterceptor);
-        retrofit = new Retrofit.Builder().baseUrl("https://swapi.dev/api/")
+        retrofit = new Retrofit.Builder().baseUrl("http://so-unlam.net.ar/api/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClientBuilder.build())
                 .build();
-        ServicioLogin client = retrofit.create(ServicioLogin.class);
-        Call<Data> call = client.getPersonaje();
+        Webservice_UNLAM webserviceUNLAM = retrofit.create(Webservice_UNLAM.class);
+        Body_Login bl = new Body_Login();
 
-        call.enqueue(new Callback<Data>(){
+        EditText email=(EditText)findViewById(R.id.inputEmail);
+        EditText password=(EditText)findViewById(R.id.inputPassword);
+        if(email.getText() != null && email.getText().toString()!=null && email.getText().toString().length() > 5){
+            //validarEmail
+            bl.setEmail(email.getText().toString());
+        }else{
+            email.setText("");
+            email.setHint("Mail invalido");
+            emailValidaOK = false;
+        }
+        bl.setEnv("DEV");
+        if(password.getText() != null && password.getText().toString()!=null && password.getText().toString().trim().length() > 8){
+            bl.setPassword(password.getText().toString().trim());
+            bl.setEmail(email.getText().toString());
+        }else{
+            password.setText("");
+            password.setHint("Password invalido");
+            passwordValidaOK = false;
+        }
+        boolean validaOK = (emailValidaOK && passwordValidaOK);
+
+        if(validaOK){
+            Call<Respuesta_Webservice> llamadoLogin = webserviceUNLAM.llamar_servicio_Login(bl);
+
+            llamadoLogin.enqueue(new Callback<Respuesta_Webservice>(){
 
 
-            @Override
-            public void onResponse(Call<Data> call, Response<Data> response) {
-               // System.out.println(response.message());
+                @Override
+                public void onResponse(Call<Respuesta_Webservice> call, Response<Respuesta_Webservice> response) {
 
-                System.out.println(response.body().getPersonaje().getName());
-            }
+                    if(response != null) {
+                        if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
+                            System.out.println(response.body().getState());
+                            String token = response.body().getToken();
+                            Token.token = token;
+                            System.out.println( Token.token);
 
-            @Override
-            public void onFailure(Call<Data> call, Throwable t) {
-                //se corta internet, no puede convertir, etc.
-                Log.d("TAG1","ERROR: "+ t.getMessage());
-            }
-        });
-*/
+                            Intent intent = new Intent( getBaseContext() , MainMenu_Activity.class);
+                            startActivity(intent);
+                        }
+
+                    }else
+                        Toast.makeText(getBaseContext(), "Revise sus credenciales", Toast.LENGTH_LONG);
+                }
+
+                @Override
+                public void onFailure(Call<Respuesta_Webservice> call, Throwable t) {
+                    //se corta internet, no puede convertir, etc.
+                    Log.d("TAG1","ERROR: "+ t.getMessage());
+                    Toast.makeText(getBaseContext(), "Revise su conexion o vuelva a intentarlo", Toast.LENGTH_LONG);
+                }
+            });
+        }else{
+            email.setText("");
+            email.setHint("Mail invalido");
+            password.setText("");
+            password.setHint("Password invalido");
+            passwordValidaOK=true;
+            emailValidaOK = true;
+            Toast.makeText(getBaseContext(), "Credenciales Incorrectas", Toast.LENGTH_LONG);
+        }
+
+
+
 
 
     }

@@ -1,14 +1,23 @@
 package com.example.servicios;
 
+import com.google.gson.annotations.SerializedName;
 
-public class Login_pojo {
-    String env;
+public class Body_registrarse {
+    @SerializedName("env")
+    String  env;
+    @SerializedName("name")
     String name;
+    @SerializedName("lastname")
     String lastname;
+    @SerializedName("dni")
     int dni;
+    @SerializedName("email")
     String email;
+    @SerializedName("password")
     String password;
+    @SerializedName("commission")
     int commission;
+    @SerializedName("group")
     int group;
 
     public String getEnv() {
