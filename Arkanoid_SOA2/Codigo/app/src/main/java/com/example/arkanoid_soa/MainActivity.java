@@ -95,8 +95,13 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(intent);
                         }
 
-                    }else
-                        Toast.makeText(getBaseContext(), "Revise sus credenciales", Toast.LENGTH_LONG);
+                        if(response == null || response.body() == null){
+                            System.out.println( "ERRRRRORRRR");
+                            Intent intent = new Intent(getBaseContext(), ErrorDeAutenticacion.class);
+                            startActivity(intent);
+                        }
+
+                    }
                 }
 
                 @Override
