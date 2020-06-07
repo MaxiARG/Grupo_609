@@ -21,14 +21,10 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.Toast;
 
 import com.example.Business.Ball;
 import com.example.Business.Brick;
 import com.example.Business.Paddle;
-
-import java.io.IOException;
-
 public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
     BreakoutView breakoutView;
