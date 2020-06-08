@@ -5,14 +5,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.Business.GameGlobalData;
+import com.example.Business.ServicioMusica;
 import com.example.servicios.Body_Login;
 import com.example.servicios.Respuesta_Webservice;
 import com.example.servicios.Webservice_UNLAM;
@@ -38,6 +41,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        stopService(new Intent(getApplicationContext(), ServicioMusica.class));
+
     }
 
     public void registrarse(View view){
@@ -46,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void ingresar(View view){
+        startService(new Intent(getApplicationContext(), ServicioMusica.class));
         boolean emailValidaOK = true;
         boolean passwordValidaOK = true;
         Retrofit retrofit;
@@ -122,10 +135,8 @@ public class MainActivity extends AppCompatActivity {
 
                     SharedPreferences sp = getSharedPreferences(GameGlobalData.preferenciasLogs, MODE_PRIVATE);
                      SharedPreferences.Editor editorSP = sp.edit();
-                     //editorSP.clear();
-                     //editorSP.commit();
-
-
+                    // editorSP.clear();
+                     // editorSP.commit();
                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
                     Date date =  new Date(System.currentTimeMillis() - 3600 * 3000);//resta 3 horas
                     String fecha = formatter.format(date);
