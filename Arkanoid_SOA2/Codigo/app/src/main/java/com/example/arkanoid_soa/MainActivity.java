@@ -1,18 +1,28 @@
 package com.example.arkanoid_soa;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.Business.Token;
+import com.example.Business.GameGlobalData;
 import com.example.servicios.Body_Login;
 import com.example.servicios.Respuesta_Webservice;
 import com.example.servicios.Webservice_UNLAM;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Map;
 
 import okhttp3.OkHttpClient.Builder;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -86,17 +96,16 @@ public class MainActivity extends AppCompatActivity {
 
                     if(response != null) {
                         if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
-                            System.out.println(response.body().getState());
                             String token = response.body().getToken();
-                            Token.token = token;
-                            System.out.println( Token.token);
+                            GameGlobalData.token = token;
+
+                            registrarLogin();//guarda el evento
 
                             Intent intent = new Intent( getBaseContext() , MainMenu_Activity.class);
                             startActivity(intent);
                         }
 
                         if(response == null || response.body() == null){
-                            System.out.println( "ERRRRRORRRR");
                             Intent intent = new Intent(getBaseContext(), ErrorDeAutenticacion.class);
                             startActivity(intent);
                         }
@@ -106,9 +115,24 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<Respuesta_Webservice> call, Throwable t) {
-                    //se corta internet, no puede convertir, etc.
-                    Log.d("TAG1","ERROR: "+ t.getMessage());
-                    Toast.makeText(getBaseContext(), "Revise su conexion o vuelva a intentarlo", Toast.LENGTH_LONG);
+                    Toast.makeText(getBaseContext(), "Revise su conexion o vuelva a intentarlo", Toast.LENGTH_LONG).show();
+                }
+
+                void registrarLogin (){
+
+                    SharedPreferences sp = getSharedPreferences(GameGlobalData.preferenciasLogs, MODE_PRIVATE);
+                     SharedPreferences.Editor editorSP = sp.edit();
+                     //editorSP.clear();
+                     //editorSP.commit();
+
+
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
+                    Date date =  new Date(System.currentTimeMillis() - 3600 * 3000);//resta 3 horas
+                    String fecha = formatter.format(date);
+                    String entrada = "Login exitoso\n";
+
+                    editorSP.putString(fecha, entrada);
+                    editorSP.apply();
                 }
             });
         }else{
@@ -118,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
             password.setHint("Password invalido");
             passwordValidaOK=true;
             emailValidaOK = true;
-            Toast.makeText(getBaseContext(), "Credenciales Incorrectas", Toast.LENGTH_LONG);
+            Toast.makeText(getBaseContext(), "Credenciales Incorrectas", Toast.LENGTH_LONG).show();
         }
 
 

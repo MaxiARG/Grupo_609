@@ -3,9 +3,15 @@ package com.example.arkanoid_soa;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import com.example.Business.GameGlobalData;
+
+import java.util.Map;
 
 public class MainMenu_Activity extends AppCompatActivity {
 
@@ -13,7 +19,7 @@ public class MainMenu_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu_);
-        Toast.makeText(this, "Conexion exitosa", Toast.LENGTH_LONG);
+        Toast.makeText(this, "Conexion exitosa", Toast.LENGTH_LONG).show();
     }
 
 
@@ -23,13 +29,15 @@ public class MainMenu_Activity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void verLogs(View view){
-        Toast.makeText(this,"Falta implementar",Toast.LENGTH_LONG).show();
-    }
-
-
     @Override
     public void onBackPressed() {
         return;
     }
+
+    public void abrirRegistroDeEventos(View view){
+        Intent intent = new Intent(this, RegistroDeEventos.class);
+        startActivity(intent);
+    }
+
+
 }

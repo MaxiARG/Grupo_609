@@ -18,7 +18,8 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ErrorDeAutenticacion"></activity>
+        <activity android:name=".RegistroDeEventos"></activity>
+        <activity android:name=".ErrorDeAutenticacion" />
         <activity android:name=".RegistroExitoso" />
         <activity android:name=".Perdiste_Activity" />
         <activity android:name=".Ganaste_Activity" />

@@ -24,6 +24,7 @@ import android.view.SurfaceView;
 
 import com.example.Business.Ball;
 import com.example.Business.Brick;
+import com.example.Business.GameGlobalData;
 import com.example.Business.Paddle;
 public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
@@ -80,7 +81,7 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
     class BreakoutView extends SurfaceView implements Runnable {
         Thread gameThread = null;
         SurfaceHolder ourHolder;
-        volatile boolean running = true;
+      //  volatile boolean running = true;
         boolean paused = true;
         Canvas canvas;
         Paint paint;
@@ -107,11 +108,7 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
         // The size of the screen in pixels
         int screenWidth;
         int screenHeight;
-
-
         Ball ball;
-
-
         public BreakoutView(Context context) {
 
             super(context);
@@ -127,8 +124,7 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
             paddle = new Paddle(screenWidth, screenHeight);
             ball = new Ball(screenWidth, screenHeight);
 
-
-            running = true;
+            GameGlobalData.gameIsRunning = true;
 
             cargarSonidos(context);
             createBricksAndRestart();
@@ -212,7 +208,7 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
             int frames = 0, ticks = 0;
             long timer = System.currentTimeMillis();
 
-            while (running) {
+            while (GameGlobalData.gameIsRunning) {
 
                 long currentTime = System.nanoTime();
                 deltaF += (currentTime - initialTime) / timeF;
@@ -367,7 +363,7 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
         }
 
         public void pause() {
-            running = false;
+            GameGlobalData.gameIsRunning = false;
             try {
                 gameThread.join();
             } catch (InterruptedException e) {
@@ -378,7 +374,7 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
         public void resume() {
             paused = false;
-            running = true;
+            GameGlobalData.gameIsRunning = true;
             gameThread = new Thread(this);
             gameThread.start();
         }

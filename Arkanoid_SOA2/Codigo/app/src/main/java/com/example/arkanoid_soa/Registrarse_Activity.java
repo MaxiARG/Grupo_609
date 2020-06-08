@@ -4,14 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.Business.Token;
-import com.example.servicios.Body_Login;
+import com.example.Business.GameGlobalData;
 import com.example.servicios.Body_registrarse;
 import com.example.servicios.Respuesta_Webservice;
 import com.example.servicios.Webservice_UNLAM;
@@ -106,8 +104,8 @@ public class Registrarse_Activity extends AppCompatActivity {
                         if (response.body() != null && response.body().getState() != null && response.body().getState().equals("success")) {
                             System.out.println(response.body().getState());
                             String token = response.body().getToken();
-                            Token.token = token;
-                            System.out.println(Token.token);
+                            GameGlobalData.token = token;
+                            System.out.println(GameGlobalData.token);
                             Intent intent = new Intent(getBaseContext(), RegistroExitoso.class);
                             startActivity(intent);
                         }

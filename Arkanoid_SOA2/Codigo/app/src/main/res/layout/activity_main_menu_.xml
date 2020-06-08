@@ -24,7 +24,7 @@
         android:layout_width="166dp"
         android:layout_height="43dp"
         android:layout_marginTop="100dp"
-        android:onClick="verLogs"
+        android:onClick="abrirRegistroDeEventos"
         android:text="Logs"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
