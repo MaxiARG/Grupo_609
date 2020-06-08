@@ -1,15 +1,10 @@
 package com.example.arkanoid_soa;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -21,11 +16,7 @@ import com.example.servicios.Respuesta_Webservice;
 import com.example.servicios.Webservice_UNLAM;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Map;
 
 import okhttp3.OkHttpClient.Builder;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -135,8 +126,11 @@ public class MainActivity extends AppCompatActivity {
 
                     SharedPreferences sp = getSharedPreferences(GameGlobalData.preferenciasLogs, MODE_PRIVATE);
                      SharedPreferences.Editor editorSP = sp.edit();
+                     if(sp.getAll().size()>GameGlobalData.Cantidad_Maxima_De_Registros){
+                         editorSP.clear();//Borro logs para mantener archivo de registros pequeño.
+                     }
                     // editorSP.clear();
-                     // editorSP.commit();
+                    // editorSP.commit();
                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
                     Date date =  new Date(System.currentTimeMillis() - 3600 * 3000);//resta 3 horas
                     String fecha = formatter.format(date);

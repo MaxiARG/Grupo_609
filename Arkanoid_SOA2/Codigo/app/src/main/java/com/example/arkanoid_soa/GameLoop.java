@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -26,6 +27,10 @@ import com.example.Business.Ball;
 import com.example.Business.Brick;
 import com.example.Business.GameGlobalData;
 import com.example.Business.Paddle;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
     BreakoutView breakoutView;
@@ -255,6 +260,7 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
             for(int i = 0; i < numBricks; i++){
                 if (bricks[i].getVisibility()){
                     if(Rect.intersects(bricks[i].getRect(), ball.getRect())) {
+                        registrarColisionConLadrillos();
                         soundPool.play(explode_id, 1, 1, 0, 0, 1);
                         bricks[i].setInvisible();
                         ball.stepBackDX();
@@ -282,6 +288,7 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
                 if (bricks[i].getVisibility()){
 
                     if(Rect.intersects(bricks[i].getRect(), ball.getRect())) {
+                        registrarColisionConLadrillos();
                         soundPool.play(explode_id, 1, 1, 0, 0, 1);
                         bricks[i].setInvisible();
                         ball.stepBackDY();
@@ -386,6 +393,21 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
                     paused = false;
             }
             return true;
+        }
+
+        void registrarColisionConLadrillos (){
+
+            SharedPreferences sp = getSharedPreferences(GameGlobalData.preferenciasLogs, MODE_PRIVATE);
+            SharedPreferences.Editor editorSP = sp.edit();
+            // editorSP.clear();
+            // editorSP.commit();
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
+            Date date =  new Date(System.currentTimeMillis() - 3600 * 3000);//resta 3 horas
+            String fecha = formatter.format(date);
+            String entrada = "Colision con Ladrillo: ("+ball.getRect().left+";"+ball.getRect().top+")\n";
+
+            editorSP.putString(fecha, entrada);
+            editorSP.apply();
         }
 
 
