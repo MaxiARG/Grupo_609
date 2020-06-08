@@ -12,6 +12,7 @@ public class Evento {
     @SerializedName("group")
     String group;
 
+
     public String getType_events() {
         return type_events;
     }

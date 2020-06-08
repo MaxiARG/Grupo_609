@@ -14,6 +14,7 @@ public class Respuesta_Webservice {
     String msg;
 
 
+
     public String getState() {
         return state;
     }
