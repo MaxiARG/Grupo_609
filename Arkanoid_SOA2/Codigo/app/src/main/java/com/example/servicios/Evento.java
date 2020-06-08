@@ -2,26 +2,15 @@ package com.example.servicios;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Body_Evento {
-
-
-    @SerializedName("env")
-    String env;
+public class Evento {
     @SerializedName("type_events")
     String type_events;
     @SerializedName("state")
     String state;
     @SerializedName("description")
     String description;
-
-
-    public String getEnv() {
-        return env;
-    }
-
-    public void setEnv(String env) {
-        this.env = env;
-    }
+    @SerializedName("group")
+    String group;
 
     public String getType_events() {
         return type_events;
@@ -45,5 +34,13 @@ public class Body_Evento {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 }
