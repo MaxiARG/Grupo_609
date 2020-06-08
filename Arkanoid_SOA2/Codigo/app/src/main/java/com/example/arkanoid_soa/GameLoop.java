@@ -27,9 +27,22 @@ import com.example.Business.Ball;
 import com.example.Business.Brick;
 import com.example.Business.GameGlobalData;
 import com.example.Business.Paddle;
+import com.example.Business.ServicioMusica;
+import com.example.servicios.Body_Evento;
+import com.example.servicios.Respuesta_RegistrarEvento;
+import com.example.servicios.Webservice_UNLAM;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
@@ -353,12 +366,14 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
             if(score == numBricks * 10){
                 paint.setTextSize(90);
                 paint.setColor(Color.RED);
+                registrarFinDelJuego();
                 canvas.drawText("VICTORIA!", screenWidth / 2,screenHeight / 2, paint);
             }
 
             if(lives <= 0){
                 paint.setTextSize(90);
                 paint.setColor(Color.RED);
+                registrarFinDelJuego();
                 canvas.drawText("PERDISTE!", screenWidth / 2,screenHeight / 2, paint);
             }
     }
@@ -371,6 +386,7 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
         public void pause() {
             GameGlobalData.gameIsRunning = false;
+
             try {
                 gameThread.join();
             } catch (InterruptedException e) {
@@ -405,9 +421,119 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
             Date date =  new Date(System.currentTimeMillis() - 3600 * 3000);//resta 3 horas
             String fecha = formatter.format(date);
             String entrada = "Colision con Ladrillo: ("+ball.getRect().left+";"+ball.getRect().top+")\n";
-
             editorSP.putString(fecha, entrada);
             editorSP.apply();
+            enviarRegistroColisionConBricks(entrada);
+        }
+        void enviarRegistroColisionConBricks(String evento){
+            Body_Evento be = new Body_Evento();
+            be.setEnv("DEV");
+            be.setType_events("Colision-Brick");
+            be.setState("Activo");
+            be.setDescription(evento);
+
+            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .callTimeout(GameGlobalData.timeout, TimeUnit.SECONDS)
+                    .readTimeout(GameGlobalData.timeout,TimeUnit.SECONDS)
+                    .build();
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(GameGlobalData.urlBase)
+                    .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
+
+            Webservice_UNLAM webserviceUNLAM = retrofit.create(Webservice_UNLAM.class);
+
+            Call<Respuesta_RegistrarEvento> llamadoEvento = webserviceUNLAM.llamar_servicio_evento(GameGlobalData.token, be);
+            llamadoEvento.enqueue(new Callback<Respuesta_RegistrarEvento>(){
+
+
+                @Override
+                public void onResponse(Call<Respuesta_RegistrarEvento> call, Response<Respuesta_RegistrarEvento> response) {
+                    if(response.isSuccessful()){
+                        //if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
+                        System.out.println("ENVIAR EVENTO Colision DIO SUCCESS");
+                    }
+
+                    if(!response.isSuccessful()){
+                        //if(response == null || response.body() == null || response.body().getState().equals("error")){
+                        if(response.body().getState().equals("error")) {
+                            System.out.println("ENVIAR EVENTO Colision DIO ERROR");
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Respuesta_RegistrarEvento> call, Throwable t) {
+                    //Toast.makeText(getBaseContext(), "Revise su conexion o vuelva a intentarlo", Toast.LENGTH_LONG).show();
+                    System.out.println("*********************************** SALIO POR ON FAILURE");
+                    System.out.println(t.getMessage()+": "+call.toString());
+                }
+
+            });
+        }
+
+        void registrarFinDelJuego (){
+
+            SharedPreferences sp = getSharedPreferences(GameGlobalData.preferenciasLogs, MODE_PRIVATE);
+            SharedPreferences.Editor editorSP = sp.edit();
+            // editorSP.clear();
+            // editorSP.commit();
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
+            Date date =  new Date(System.currentTimeMillis() - 3600 * 3000);//resta 3 horas
+            String fecha = formatter.format(date);
+            String entrada = "Finaliza Juego: \n";
+            editorSP.putString(fecha, entrada);
+            editorSP.apply();
+            enviarRegistroFinJuego(entrada);
+        }
+        void enviarRegistroFinJuego(String evento){
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
+            Date date =  new Date(System.currentTimeMillis() - 3600 * 3000);//resta 3 horas
+            String fecha = formatter.format(date);
+            Body_Evento be = new Body_Evento();
+            be.setEnv("DEV");
+            be.setType_events("Finaliza-Juego");
+            be.setState("Activo");
+            be.setDescription(evento+" "+fecha);
+
+            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                    .callTimeout(GameGlobalData.timeout, TimeUnit.SECONDS)
+                    .readTimeout(GameGlobalData.timeout,TimeUnit.SECONDS)
+                    .build();
+            Retrofit retrofit = new Retrofit.Builder().baseUrl(GameGlobalData.urlBase)
+                    .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
+
+            Webservice_UNLAM webserviceUNLAM = retrofit.create(Webservice_UNLAM.class);
+
+            Call<Respuesta_RegistrarEvento> llamadoEvento = webserviceUNLAM.llamar_servicio_evento(GameGlobalData.token, be);
+            llamadoEvento.enqueue(new Callback<Respuesta_RegistrarEvento>(){
+
+
+                @Override
+                public void onResponse(Call<Respuesta_RegistrarEvento> call, Response<Respuesta_RegistrarEvento> response) {
+                    if(response.isSuccessful()){
+                        //if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
+                        System.out.println("ENVIAR EVENTO FIN Juego DIO SUCCESS");
+                    }
+
+                    if(!response.isSuccessful()){
+                        //if(response == null || response.body() == null || response.body().getState().equals("error")){
+                        if(response.body().getState().equals("error")) {
+                            System.out.println("ENVIAR EVENTO FIN Juego DIO ERROR");
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Respuesta_RegistrarEvento> call, Throwable t) {
+                    //Toast.makeText(getBaseContext(), "Revise su conexion o vuelva a intentarlo", Toast.LENGTH_LONG).show();
+                    System.out.println("*********************************** FIN Juego SALIO POR ON FAILURE");
+                    System.out.println(t.getMessage()+": "+call.toString());
+                }
+
+            });
         }
 
 

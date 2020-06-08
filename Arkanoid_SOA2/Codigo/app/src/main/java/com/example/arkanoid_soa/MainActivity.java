@@ -67,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
         loggingInterceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .callTimeout(100, TimeUnit.SECONDS)
-                .readTimeout(100,TimeUnit.SECONDS)
+                .callTimeout(GameGlobalData.timeout, TimeUnit.SECONDS)
+                .readTimeout(GameGlobalData.timeout,TimeUnit.SECONDS)
                 .build();
 
 
@@ -110,16 +110,10 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<Respuesta_Webservice> call, Response<Respuesta_Webservice> response) {
 
-                    if(response != null) {
-                        if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
-                           // Gson miGsonConverter = new GsonBuilder().disableHtmlEscaping().create();
-                         //   String j = miGsonConverter.toJson(response.body());
-                          //  System.out.println("MENSAJE ES: "+  j);
-                            //startService(new Intent(getApplicationContext(), ServicioMusica.class));
-                           // Gson gs =
-                           // Respuesta_Webservice r = gs.fromJson(j, Respuesta_Webservice.class);
-                            //System.out.println("LEIDO DE GSON ES: "+ r.getToken());
-
+                    if(response.isSuccessful()){
+                  //  if(response != null) {
+                      //  if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
+                            startService(new Intent(getApplicationContext(), ServicioMusica.class));
                             String token = response.body().getToken();
                             GameGlobalData.token = token;
                             System.out.println("XXXXXXXXXXXXXXX:  "+token);
@@ -134,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                             Intent intent = new Intent(getBaseContext(), ErrorDeAutenticacion.class);
                             startActivity(intent);
                         }
-                    }
+
                 }
                 @Override
                 public void onFailure(Call<Respuesta_Webservice> call, Throwable t) {
@@ -148,8 +142,10 @@ public class MainActivity extends AppCompatActivity {
                      if(sp.getAll().size()>GameGlobalData.Cantidad_Maxima_De_Registros){
                          editorSP.clear();//Borro logs para mantener archivo de registros pequeño.
                      }
-                    // editorSP.clear();
-                    // editorSP.commit();
+                     if(GameGlobalData.limpiarLogs) {
+                         editorSP.clear();
+                         editorSP.commit();
+                     }
                     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
                     Date date =  new Date(System.currentTimeMillis() - 3600 * 3000);//resta 3 horas
                     String fecha = formatter.format(date);
@@ -165,21 +161,12 @@ public class MainActivity extends AppCompatActivity {
                     be.setState("Activo");
                     be.setDescription("Usuario Ingreso Correctamente");
 
-                   // Runnable enviarEvento = new EnviarEventosAServidor(be);
-                    //Thread t = new Thread(enviarEvento);
-                    //t.start();
-
-                   // Gson miGsonConverter = new GsonBuilder().disableHtmlEscaping().create();
                     HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
 
                     OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                            .callTimeout(100, TimeUnit.SECONDS)
-                            .readTimeout(100,TimeUnit.SECONDS)
+                            .callTimeout(GameGlobalData.timeout, TimeUnit.SECONDS)
+                            .readTimeout(GameGlobalData.timeout,TimeUnit.SECONDS)
                             .build();
-
-                   // OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder().addInterceptor(loggingInterceptor)
-                         //   .connectTimeout(15, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).writeTimeout(15, TimeUnit.SECONDS);
-
                     Retrofit retrofit = new Retrofit.Builder().baseUrl(GameGlobalData.urlBase)
                             .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
 
@@ -193,11 +180,13 @@ public class MainActivity extends AppCompatActivity {
                         public void onResponse(Call<Respuesta_RegistrarEvento> call, Response<Respuesta_RegistrarEvento> response) {
                             System.out.println("RESPONESE REGISTRAREVENTO");
                             //System.out.println(response.body().toString());
-                            if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
+                            if(response.isSuccessful()){
+                            //if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
                                 System.out.println("ENVIAR EVENTO LOGIN DIO SUCCESS");
                             }
 
-                            if(response == null || response.body() == null || response.body().getState().equals("error")){
+                            if(!response.isSuccessful()){
+                            //if(response == null || response.body() == null || response.body().getState().equals("error")){
                                 if(response.body().getState().equals("error")) {
                                     System.out.println("ENVIAR EVENTO LOGIN DIO ERROR");
                                 }
