@@ -33,6 +33,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import okhttp3.OkHttpClient;
 public class MainActivity extends AppCompatActivity {
+    EditText email;
+    EditText password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,55 +56,49 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private boolean validarMailPass(EditText email, EditText password){
+            boolean esValido = true;
+            String m = email.getText().toString().trim();
+            String p = password.getText().toString().trim();
+            if(m==null || m.length() == 0 || m.equals("")){
+                email.setText("Este Campo No Puede Estar Vacio");
+                esValido=false;
+            }
+            if(p==null || p.length() == 0 || p.equals("")){
+                password.setText("Este Campo No Puede Estar Vacio");
+                esValido=false;
+            }
+            if(p!=null && !p.equals("") && p.length() <8 ){
+                password.setText("El Password Debe Tener Almenos 8 Caracteres");
+                esValido=false;
+            }
+            //Validar con regex formato de mail.
+            return esValido;
+    }
+
     public void ingresar(View view){
-
-        boolean emailValidaOK = true;
-        boolean passwordValidaOK = true;
         Retrofit retrofit;
-        HttpLoggingInterceptor loggingInterceptor;
-        Builder httpClientBuilder;
-        Gson miGsonConverter = new GsonBuilder().disableHtmlEscaping().create();
-
-
-        loggingInterceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .callTimeout(GameGlobalData.timeout, TimeUnit.SECONDS)
                 .readTimeout(GameGlobalData.timeout,TimeUnit.SECONDS)
                 .build();
 
-
-        httpClientBuilder = new Builder().addInterceptor(loggingInterceptor);
         retrofit = new Retrofit.Builder().baseUrl(GameGlobalData.urlBase)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient).build();
-                //.client(httpClientBuilder.build()).build();
 
         Webservice_UNLAM webserviceUNLAM = retrofit.create(Webservice_UNLAM.class);
         Body_Login bl = new Body_Login();
-
-        EditText email=(EditText)findViewById(R.id.inputEmail);
-        EditText password=(EditText)findViewById(R.id.inputPassword);
-        if(email.getText() != null && email.getText().toString()!=null && email.getText().toString().length() > 5){
-            //validarEmail
-            bl.setEmail(email.getText().toString());
-        }else{
-            email.setText("");
-            email.setHint("Mail invalido");
-            emailValidaOK = false;
-        }
         bl.setEnv("DEV");
-        if(password.getText() != null && password.getText().toString()!=null && password.getText().toString().trim().length() > 8){
-            bl.setPassword(password.getText().toString().trim());
-            bl.setEmail(email.getText().toString());
-        }else{
-            password.setText("");
-            password.setHint("Password invalido");
-            passwordValidaOK = false;
-        }
-        boolean validaOK = (emailValidaOK && passwordValidaOK);
+
+        email=(EditText)findViewById(R.id.inputEmail);
+        password=(EditText)findViewById(R.id.inputPassword);
+        boolean validaOK = validarMailPass(email,password);
 
         if(validaOK){
+            bl.setPassword(password.getText().toString().trim());
+            bl.setEmail(email.getText().toString().trim());
             Call<Respuesta_Webservice> llamadoLogin = webserviceUNLAM.llamar_servicio_Login(bl);
             llamadoLogin.enqueue(new Callback<Respuesta_Webservice>(){
 
@@ -111,18 +107,17 @@ public class MainActivity extends AppCompatActivity {
                 public void onResponse(Call<Respuesta_Webservice> call, Response<Respuesta_Webservice> response) {
 
                     if(response.isSuccessful()){
-                  //  if(response != null) {
-                      //  if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
+                        if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
                            // startService(new Intent(getApplicationContext(), ServicioMusica.class));
-                            String token = response.body().getToken();
-                            GameGlobalData.token = token;
-                            System.out.println("XXXXXXXXXXXXXXX:  "+token);
-                            registrarLogin();//guarda el evento
-                            enviarRegistroLoginAServidor();
+                            GameGlobalData.limpiarLogs(getBaseContext());
+                            GameGlobalData.token =  response.body().getToken();
+                            GameGlobalData.guardarEvento(getBaseContext(),GameGlobalData.fechaHora(),"Login Exitoso\n");
+                            GameGlobalData.enviarEvento("LOGIN", "Usuario se loguea al sistema");
 
                             Intent intent = new Intent( getBaseContext() , MainMenu_Activity.class);
                             startActivity(intent);
                         }
+                    }
 
                         if(response == null || response.body() == null){
                             Intent intent = new Intent(getBaseContext(), ErrorDeAutenticacion.class);
@@ -135,82 +130,12 @@ public class MainActivity extends AppCompatActivity {
                     System.out.println(t.getMessage());
                     Toast.makeText(getBaseContext(), "Revise su conexion o vuelva a intentarlo", Toast.LENGTH_LONG).show();
                 }
-
-                void registrarLogin (){
-
-                    SharedPreferences sp = getSharedPreferences(GameGlobalData.preferenciasLogs, MODE_PRIVATE);
-                     SharedPreferences.Editor editorSP = sp.edit();
-                     if(sp.getAll().size()>GameGlobalData.Cantidad_Maxima_De_Registros){
-                         editorSP.clear();//Borro logs para mantener archivo de registros pequeño.
-                     }
-                     if(GameGlobalData.limpiarLogs) {
-                         editorSP.clear();
-                         editorSP.commit();
-                     }
-                    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
-                    Date date =  new Date(System.currentTimeMillis() - 3600 * 3000);//resta 3 horas
-                    String fecha = formatter.format(date);
-                    String entrada = "Login exitoso\n";
-
-                    editorSP.putString(fecha, entrada);
-                    editorSP.apply();
-                }
-                void enviarRegistroLoginAServidor(){
-                    Body_Evento be = new Body_Evento();
-                    be.setEnv("DEV");
-                    be.setType_events("Login");
-                    be.setState("Activo");
-                    be.setDescription("Usuario Ingreso Correctamente");
-
-                    HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
-
-                    OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                            .callTimeout(GameGlobalData.timeout, TimeUnit.SECONDS)
-                            .readTimeout(GameGlobalData.timeout,TimeUnit.SECONDS)
-                            .build();
-                    Retrofit retrofit = new Retrofit.Builder().baseUrl(GameGlobalData.urlBase)
-                            .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
-
-                    Webservice_UNLAM webserviceUNLAM = retrofit.create(Webservice_UNLAM.class);
-
-                    Call<Respuesta_RegistrarEvento> llamadoEvento = webserviceUNLAM.llamar_servicio_evento(GameGlobalData.token, be);
-                    llamadoEvento.enqueue(new Callback<Respuesta_RegistrarEvento>(){
-
-
-                        @Override
-                        public void onResponse(Call<Respuesta_RegistrarEvento> call, Response<Respuesta_RegistrarEvento> response) {
-                            System.out.println("RESPONESE REGISTRAREVENTO");
-                            //System.out.println(response.body().toString());
-                            if(response.isSuccessful()){
-                            //if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
-                                System.out.println("ENVIAR EVENTO LOGIN DIO SUCCESS");
-                            }
-
-                            if(!response.isSuccessful()){
-                            //if(response == null || response.body() == null || response.body().getState().equals("error")){
-                                if(response.body().getState().equals("error")) {
-                                    System.out.println("ENVIAR EVENTO LOGIN DIO ERROR");
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<Respuesta_RegistrarEvento> call, Throwable t) {
-                            //Toast.makeText(getBaseContext(), "Revise su conexion o vuelva a intentarlo", Toast.LENGTH_LONG).show();
-                            System.out.println("*********************************** SALIO POR ON FAILURE");
-                            System.out.println(t.getMessage()+": "+call.toString());
-                        }
-
-                    });
-                }
             });
         }else{
             email.setText("");
             email.setHint("Mail invalido");
             password.setText("");
             password.setHint("Password invalido");
-            passwordValidaOK=true;
-            emailValidaOK = true;
             Toast.makeText(getBaseContext(), "Credenciales Incorrectas", Toast.LENGTH_LONG).show();
         }
 

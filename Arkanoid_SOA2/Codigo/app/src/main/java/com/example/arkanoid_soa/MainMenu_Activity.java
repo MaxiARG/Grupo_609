@@ -39,7 +39,9 @@ public class MainMenu_Activity extends AppCompatActivity {
 
 
     public void StartGameButton(View view){
-        registrarInicioDelJuego();
+       // registrarInicioDelJuego();
+        GameGlobalData.guardarEvento(getBaseContext(), GameGlobalData.fechaHora(), "Inicia Juego");
+        GameGlobalData.enviarEvento("Inicia-Juego", "El juego ha comenzado");
         Intent intent = new Intent(this, GameLoop.class);
         startActivity(intent);
     }
@@ -67,7 +69,7 @@ public class MainMenu_Activity extends AppCompatActivity {
         String entrada = "Inicia Juego: \n";
         editorSP.putString(fecha, entrada);
         editorSP.apply();
-        enviarRegistroIniciaJuego(entrada);
+       // enviarRegistroIniciaJuego(entrada);
     }
     void enviarRegistroIniciaJuego(String evento){
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");

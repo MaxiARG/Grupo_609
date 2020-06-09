@@ -51,8 +51,6 @@ public class GameLoop extends AppCompatActivity {
 
     BreakoutView breakoutView;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,9 +106,7 @@ public class GameLoop extends AppCompatActivity {
         int filas = 6;
         int columnas = 5;
 
-        private long timeThisFrame;
-        // The size of the screen in pixels
-        int screenWidth;
+        int screenWidth;//tamaño de pantalla en pixeles
         int screenHeight;
         Ball ball;
 
@@ -219,10 +215,8 @@ public class GameLoop extends AppCompatActivity {
 
             bullets.clear();
             spawnedBullets=0;
-            if (lives == 0) {
-                score = 0;
-                lives = 3;
-            }
+            score = 0;
+            lives = 3;
         }
 
         @Override
@@ -231,7 +225,6 @@ public class GameLoop extends AppCompatActivity {
             long initialTime = System.nanoTime();
             final double timeF = 1000000000 / 60;
             double  deltaF = 0;
-            int frames = 0, ticks = 0;
             long timer = System.currentTimeMillis();
 
             while (GameGlobalData.gameIsRunning) {
@@ -240,92 +233,34 @@ public class GameLoop extends AppCompatActivity {
                 deltaF += (currentTime - initialTime) / timeF;
                 initialTime = currentTime;
 
-
-                System.out.println("CONTAOR_ "+cooldown_counter);
                 if (deltaF >= 1 && !paused) {
-
                     cooldown_counter += (float)deltaF/100;
-                    if(cooldown_counter <= 0){
+                    if(cooldown_counter <= 0)
                         cooldown_counter = GameGlobalData.bullet_cooldown;
-                    }
-
                     update((float)deltaF/1000);//lo convierto a milisegundos
-                    frames++;
                     deltaF--;
                 }
                 draw();
-
-                if (System.currentTimeMillis() - timer > 1000) {
-                    //System.out.println(String.format("FPS: %s", frames));
-                    frames = 0;
-                    ticks = 0;
+                if (System.currentTimeMillis() - timer > 1000)
                     timer += 1000;
-                }
             }
 
         }
-
-
-
 
         public void update(float deltaTime) {
 
             paddle.update();
 
             ball.stepDX();
-            //Colision Con Pared al moverse en X
-            if(ball.getRect().left<0 || ball.getRect().right > screenWidth){
-                soundPool.play(beep3_id, 1, 1, 0, 0, 1);
-                ball.stepBackDX();
-                ball.invertirDX();
-            }
-            //Colision con Paddle al moverse en X
-            if(Rect.intersects(paddle.getRect(), ball.getRect())){
-                soundPool.play(beep2_id, 1, 1, 0, 0, 1);
-                ball.stepBackDX();
-                ball.randomizeDY();
-            }
-            //Colision con Bricks al moverse en X
-            for(int i = 0; i < numBricks; i++){
-                if (bricks[i].getVisibility()){
-                    if(Rect.intersects(bricks[i].getRect(), ball.getRect())) {
-                        registrarColisionConLadrillos();
-                        soundPool.play(explode_id, 1, 1, 0, 0, 1);
-                        bricks[i].setInvisible();
-                        ball.stepBackDX();
-                        ball.invertirDX();
-                        score = score + 10;
-                    }
-                }
-            }
+            checkear_Colision_BallPared_X(); //Colision Con Pared al moverse en X
+            checkear_Colision_Ball_Paddle_X(); //Colision con Paddle al moverse en X
+            checkear_Colision_BallBrick_X(); //Colision con Bricks al moverse en X
 
             ball.stepDY();
-            //Colision Con Pared al moverse en Y
-            if(ball.getRect().top<0 ){
-                soundPool.play(beep3_id, 1, 1, 0, 0, 1);
-                ball.stepBackDY();
-                ball.invertirDY();
-            }
-            //Colision con Paddle al moverse en Y
-            if(Rect.intersects(paddle.getRect(), ball.getRect())){
-                soundPool.play(beep2_id, 1, 1, 0, 0, 1);
-                ball.stepBackDY();
-                ball.randomizeDY();
-            }
-            //Colision con Bricks al moverse en Y
-            for(int i = 0; i < numBricks; i++){
-                if (bricks[i].getVisibility()){
+            checkear_Colision_BallPared_Y();//Colision Con Pared al moverse en Y
+            checkear_Colision_PaddleBall_Y(); //Colision con Paddle al moverse en Y
+            checkear_Colision_BallBrick_Y();//Colision con Bricks al moverse en Y
 
-                    if(Rect.intersects(bricks[i].getRect(), ball.getRect())) {
-                        registrarColisionConLadrillos();
-                        soundPool.play(explode_id, 1, 1, 0, 0, 1);
-                        bricks[i].setInvisible();
-                        ball.stepBackDY();
-                        ball.invertirDY();
-                        score = score + 10;
-                    }
-                }
-            }
             //Colision con Bullet-Brick
             for(int i = 0; i < bullets.size(); i++) {
                 for(int j = 0; j < numBricks; j++){
@@ -338,13 +273,96 @@ public class GameLoop extends AppCompatActivity {
 
                 }
             }
+            moverUnStep_Bullets();
+            checkear_Colision_BallSuelo();
+            verificar_CondicionDeVictoria();
+        }
+
+        private void moverUnStep_Bullets() {
             for (Bullet b : bullets){
                 if(b.shouldMove()){
                     b.stepDY();
                 }
             }
+        }
 
-            //Ball choca contra el suelo
+        private void verificar_CondicionDeVictoria() {
+            if(score == numBricks * 10){ //VERIFICAR ESE NUMERO!
+                paused = true;
+                soundPool.play(win_id, 1, 1, 0, 0, 1);
+                paddle.resetPosition();
+                GameGlobalData.guardarEvento(getBaseContext() ,GameGlobalData.fechaHora(), "Fin del Juego. GANASTE\n");
+                GameGlobalData.enviarEvento("Fin-Juego", "El Jugador ah GANADO");
+
+                createBricksAndRestart();
+
+                Intent intent = new Intent(this.getContext() , Ganaste_Activity.class);
+                startActivity(intent);
+            }
+        }
+
+        private void checkear_Colision_BallPared_X() {
+            if(ball.getRect().left<0 || ball.getRect().right > screenWidth){
+                soundPool.play(beep3_id, 1, 1, 0, 0, 1);
+                ball.stepBackDX();
+                ball.invertirDX();
+            }
+        }
+
+        private void checkear_Colision_Ball_Paddle_X() {
+            if(Rect.intersects(paddle.getRect(), ball.getRect())){
+                soundPool.play(beep2_id, 1, 1, 0, 0, 1);
+                ball.stepBackDX();
+                ball.randomizeDY();
+            }
+        }
+
+        private void checkear_Colision_BallBrick_X() {
+            for(int i = 0; i < numBricks; i++){
+                if (bricks[i].getVisibility()){
+                    if(Rect.intersects(bricks[i].getRect(), ball.getRect())) {
+                        soundPool.play(explode_id, 1, 1, 0, 0, 1);
+                        bricks[i].setInvisible();
+                        ball.stepBackDX();
+                        ball.invertirDX();
+                        score = score + 10;
+                    }
+                }
+            }
+        }
+
+        private void checkear_Colision_BallPared_Y() {
+            if(ball.getRect().top<0 ){
+                soundPool.play(beep3_id, 1, 1, 0, 0, 1);
+                ball.stepBackDY();
+                ball.invertirDY();
+            }
+        }
+
+        private void checkear_Colision_PaddleBall_Y() {
+            if(Rect.intersects(paddle.getRect(), ball.getRect())){
+                soundPool.play(beep2_id, 1, 1, 0, 0, 1);
+                ball.stepBackDY();
+                ball.randomizeDY();
+            }
+        }
+
+        private void checkear_Colision_BallBrick_Y() {
+            for(int i = 0; i < numBricks; i++){
+                if (bricks[i].getVisibility()){
+
+                    if(Rect.intersects(bricks[i].getRect(), ball.getRect())) {
+                        soundPool.play(explode_id, 1, 1, 0, 0, 1);
+                        bricks[i].setInvisible();
+                        ball.stepBackDY();
+                        ball.invertirDY();
+                        score = score + 10;
+                    }
+                }
+            }
+        }
+
+        private void checkear_Colision_BallSuelo() {
             if( ball.getRect().bottom > screenHeight-ball.getRect().height() ){
                 lives --;
                 ball.stepBackDY();
@@ -353,27 +371,29 @@ public class GameLoop extends AppCompatActivity {
                 paused = true;
                 ball.reset();
                 paddle.resetPosition();
+                GameGlobalData.guardarEvento(getBaseContext() ,GameGlobalData.fechaHora(), "Pierde 1 Vida\n");
+                GameGlobalData.enviarEvento("Pierde-Vida", "Pierde 1 Vida");
 
-                if(lives == 0){
-                    paused = true;
-                    paddle.resetPosition();
-                    soundPool.play(explode_id, 1, 1, 0, 0, 1);
-                    Intent intent = new Intent(this.getContext() , Perdiste_Activity.class );
-                    startActivity(intent);
-                    createBricksAndRestart();
-                }
-            }
-
-            //Verifica condicion de victoria
-            if(score == numBricks * 10){ //VERIFICAR ESE NUMERO!
-                paused = true;
-                soundPool.play(win_id, 1, 1, 0, 0, 1);
-                paddle.resetPosition();
-                createBricksAndRestart();
-                Intent intent = new Intent(this.getContext() , Ganaste_Activity.class);
-                startActivity(intent);
+                verificar_SinVidasRestantes();
             }
         }
+
+        private void verificar_SinVidasRestantes() {
+            if(lives == 0){
+                paused = true;
+                paddle.resetPosition();
+                soundPool.play(explode_id, 1, 1, 0, 0, 1);
+
+                GameGlobalData.guardarEvento(getBaseContext() ,GameGlobalData.fechaHora(), "Fin del Juego. Perdio\n");
+                GameGlobalData.enviarEvento("Fin-Juego", "El Jugador Perdio Todas Sus Vidas");
+
+                Intent intent = new Intent(this.getContext() , Perdiste_Activity.class );
+                startActivity(intent);
+
+                createBricksAndRestart();
+            }
+        }
+
         public void draw() {
 
             if (ourHolder.getSurface().isValid()) {
@@ -400,14 +420,16 @@ public class GameLoop extends AppCompatActivity {
             if(score == numBricks * 10){
                 paint.setTextSize(90);
                 paint.setColor(Color.RED);
-                registrarFinDelJuego();
+                GameGlobalData.guardarEvento(getContext() , GameGlobalData.fechaHora(),"Victoria");
+                GameGlobalData.enviarEvento("Fin-Juego", "El jugador Ha Ganado");
                 canvas.drawText("VICTORIA!", screenWidth / 2,screenHeight / 2, paint);
             }
 
             if(lives <= 0){
                 paint.setTextSize(90);
                 paint.setColor(Color.RED);
-                registrarFinDelJuego();
+                GameGlobalData.guardarEvento(getContext() , GameGlobalData.fechaHora(),"Victoria");
+                GameGlobalData.enviarEvento("Fin-Juego", "El jugador Ha Perdido");
                 canvas.drawText("PERDISTE!", screenWidth / 2,screenHeight / 2, paint);
             }
     }
@@ -415,7 +437,7 @@ public class GameLoop extends AppCompatActivity {
         private void dibujarScore() {
             paint.setColor(Color.argb(255,  255, 255, 255));
             paint.setTextSize(40);
-            canvas.drawText("Score: " + score + "   Lives: " + lives, 10,50, paint);
+            canvas.drawText("Puntaje: " + score + "   Vidas: " + lives, 10,50, paint);
         }
 
         public void pause() {
@@ -445,132 +467,6 @@ public class GameLoop extends AppCompatActivity {
             return true;
         }
 
-        void registrarColisionConLadrillos (){
-
-            SharedPreferences sp = getSharedPreferences(GameGlobalData.preferenciasLogs, MODE_PRIVATE);
-            SharedPreferences.Editor editorSP = sp.edit();
-            // editorSP.clear();
-            // editorSP.commit();
-            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
-            Date date =  new Date(System.currentTimeMillis() - 3600 * 3000);//resta 3 horas
-            String fecha = formatter.format(date);
-            String entrada = "Colision con Ladrillo: ("+ball.getRect().left+";"+ball.getRect().top+")\n";
-            editorSP.putString(fecha, entrada);
-            editorSP.apply();
-            enviarRegistroColisionConBricks(entrada);
-        }
-        void enviarRegistroColisionConBricks(String evento){
-            Body_Evento be = new Body_Evento();
-            be.setEnv("DEV");
-            be.setType_events("Colision-Brick");
-            be.setState("Activo");
-            be.setDescription(evento);
-
-            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
-
-            OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .callTimeout(GameGlobalData.timeout, TimeUnit.SECONDS)
-                    .readTimeout(GameGlobalData.timeout,TimeUnit.SECONDS)
-                    .build();
-            Retrofit retrofit = new Retrofit.Builder().baseUrl(GameGlobalData.urlBase)
-                    .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
-
-            Webservice_UNLAM webserviceUNLAM = retrofit.create(Webservice_UNLAM.class);
-
-            Call<Respuesta_RegistrarEvento> llamadoEvento = webserviceUNLAM.llamar_servicio_evento(GameGlobalData.token, be);
-            llamadoEvento.enqueue(new Callback<Respuesta_RegistrarEvento>(){
-
-
-                @Override
-                public void onResponse(Call<Respuesta_RegistrarEvento> call, Response<Respuesta_RegistrarEvento> response) {
-                    if(response.isSuccessful()) {
-                        if (response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")) {
-                            System.out.println("ENVIAR EVENTO Colision DIO SUCCESS");
-                        }
-                    }
-
-                    if(!response.isSuccessful()){
-                        if(response == null || response.body() == null || response.body().getState().equals("error")) {
-
-                                System.out.println("ENVIAR EVENTO Colision DIO ERROR");
-
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Respuesta_RegistrarEvento> call, Throwable t) {
-                    //Toast.makeText(getBaseContext(), "Revise su conexion o vuelva a intentarlo", Toast.LENGTH_LONG).show();
-                    System.out.println("*********************************** SALIO POR ON FAILURE");
-                    System.out.println(t.getMessage()+": "+call.toString());
-                }
-
-            });
-        }
-        void registrarFinDelJuego (){
-
-            SharedPreferences sp = getSharedPreferences(GameGlobalData.preferenciasLogs, MODE_PRIVATE);
-            SharedPreferences.Editor editorSP = sp.edit();
-            // editorSP.clear();
-            // editorSP.commit();
-            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
-            Date date =  new Date(System.currentTimeMillis() - 3600 * 3000);//resta 3 horas
-            String fecha = formatter.format(date);
-            String entrada = "Finaliza Juego: \n";
-            editorSP.putString(fecha, entrada);
-            editorSP.apply();
-            enviarRegistroFinJuego(entrada);
-        }
-        void enviarRegistroFinJuego(String evento){
-            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
-            Date date =  new Date(System.currentTimeMillis() - 3600 * 3000);//resta 3 horas
-            String fecha = formatter.format(date);
-            Body_Evento be = new Body_Evento();
-            be.setEnv("DEV");
-            be.setType_events("Finaliza-Juego");
-            be.setState("Activo");
-            be.setDescription(evento+" "+fecha);
-
-            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
-
-            OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .callTimeout(GameGlobalData.timeout, TimeUnit.SECONDS)
-                    .readTimeout(GameGlobalData.timeout,TimeUnit.SECONDS)
-                    .build();
-            Retrofit retrofit = new Retrofit.Builder().baseUrl(GameGlobalData.urlBase)
-                    .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient).build();
-
-            Webservice_UNLAM webserviceUNLAM = retrofit.create(Webservice_UNLAM.class);
-
-            Call<Respuesta_RegistrarEvento> llamadoEvento = webserviceUNLAM.llamar_servicio_evento(GameGlobalData.token, be);
-            llamadoEvento.enqueue(new Callback<Respuesta_RegistrarEvento>(){
-
-
-                @Override
-                public void onResponse(Call<Respuesta_RegistrarEvento> call, Response<Respuesta_RegistrarEvento> response) {
-                    if(response.isSuccessful()){
-                        //if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
-                        System.out.println("ENVIAR EVENTO FIN Juego DIO SUCCESS");
-                    }
-
-                    if(!response.isSuccessful()){
-                        if(response == null || response.body() == null || response.body().getState().equals("error")) {
-                            System.out.println("ENVIAR EVENTO FIN Juego DIO ERROR");
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Respuesta_RegistrarEvento> call, Throwable t) {
-                    //Toast.makeText(getBaseContext(), "Revise su conexion o vuelva a intentarlo", Toast.LENGTH_LONG).show();
-                    System.out.println("*********************************** FIN Juego SALIO POR ON FAILURE");
-                    System.out.println(t.getMessage()+": "+call.toString());
-                }
-
-            });
-        }
-
-
         @Override
         public void onSensorChanged(SensorEvent event) {
 
@@ -579,13 +475,12 @@ public class GameLoop extends AppCompatActivity {
                 if (event.values[0] <= 0.09f) {
                     System.out.println("PRIMERO");
                     if(cooldown_counter > GameGlobalData.bullet_cooldown) {
-                        System.out.println("SEGUNDO "+cooldown_counter);
+                        System.out.println("********** DISPARAAAAAR **************"+cooldown_counter);
                         Bullet b = new Bullet(screenWidth, screenHeight, paddle.LEFT);
                         b.setShouldMove(true);
                         bullets.add(b);
                         cooldown_counter = 0;
                     }
-
 
                 }
             }
@@ -602,9 +497,8 @@ public class GameLoop extends AppCompatActivity {
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+            return;
         }
-
     }
 
 }
