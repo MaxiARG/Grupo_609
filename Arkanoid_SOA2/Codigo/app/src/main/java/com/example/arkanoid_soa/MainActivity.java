@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                     if(response.isSuccessful()){
                   //  if(response != null) {
                       //  if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
-                            startService(new Intent(getApplicationContext(), ServicioMusica.class));
+                           // startService(new Intent(getApplicationContext(), ServicioMusica.class));
                             String token = response.body().getToken();
                             GameGlobalData.token = token;
                             System.out.println("XXXXXXXXXXXXXXX:  "+token);
@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 @Override
                 public void onFailure(Call<Respuesta_Webservice> call, Throwable t) {
+                    System.out.println(t.getMessage());
                     Toast.makeText(getBaseContext(), "Revise su conexion o vuelva a intentarlo", Toast.LENGTH_LONG).show();
                 }
 

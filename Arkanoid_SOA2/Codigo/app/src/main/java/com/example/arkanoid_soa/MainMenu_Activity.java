@@ -97,14 +97,16 @@ public class MainMenu_Activity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Respuesta_RegistrarEvento> call, Response<Respuesta_RegistrarEvento> response) {
                 if(response.isSuccessful()){
-                    //if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
+                    if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")) {
                     System.out.println("ENVIAR EVENTO Inicia Juego DIO SUCCESS");
+                    }
                 }
 
                 if(!response.isSuccessful()){
-                    //if(response == null || response.body() == null || response.body().getState().equals("error")){
-                    if(response.body().getState().equals("error")) {
-                        System.out.println("ENVIAR EVENTO Inicia Juego DIO ERROR");
+                    if(response == null || response.body() == null || response.body().getState().equals("error")) {
+
+                            System.out.println("ENVIAR EVENTO Inicia Juego DIO ERROR");
+
                     }
                 }
             }

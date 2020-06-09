@@ -25,6 +25,7 @@ import android.view.SurfaceView;
 
 import com.example.Business.Ball;
 import com.example.Business.Brick;
+import com.example.Business.Bullet;
 import com.example.Business.GameGlobalData;
 import com.example.Business.Paddle;
 import com.example.Business.ServicioMusica;
@@ -33,7 +34,9 @@ import com.example.servicios.Respuesta_RegistrarEvento;
 import com.example.servicios.Webservice_UNLAM;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -44,27 +47,17 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class GameLoop extends AppCompatActivity implements SensorEventListener {
+public class GameLoop extends AppCompatActivity {
 
     BreakoutView breakoutView;
-    SensorManager sensorManager;
-    Sensor accelerometer;
-    Point size;
-    Paddle paddle=null;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         breakoutView = new BreakoutView(this);
         setContentView(breakoutView);
-
-        Display display = getWindowManager().getDefaultDisplay();
-        size = new Point();
-        display.getSize(size);
-
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(GameLoop.this, accelerometer, sensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
@@ -79,27 +72,20 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
         breakoutView.pause();
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if( paddle != null && event.values[0] > 0.7f && paddle.getRect().left > 0){//inclinado a izquierda
-            paddle.setMovementState(paddle.LEFT);
-        }else
-        if( paddle != null && event.values[0] < -0.7f && (paddle.getRect().left+paddle.getRect().width()) < size.x){//inclinado a derecha
-            paddle.setMovementState(paddle.RIGHT);
-        }else {
-            paddle.setMovementState(paddle.STOPPED);
-        }
-    }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-    class BreakoutView extends SurfaceView implements Runnable {
+    class BreakoutView extends SurfaceView implements Runnable, SensorEventListener {
+        SensorManager sensorManager;
+        Sensor accelerometer;
+        Sensor proximity;
+        Point size;
+        Paddle paddle=null;
+        int max_bullet_count = 5;
+        int spawnedBullets =0;
+        List<Bullet> bullets = new ArrayList<Bullet>(max_bullet_count);
+        float cooldown_counter = 0;
+        /////////
         Thread gameThread = null;
         SurfaceHolder ourHolder;
-      //  volatile boolean running = true;
         boolean paused = true;
         Canvas canvas;
         Paint paint;
@@ -127,12 +113,23 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
         int screenWidth;
         int screenHeight;
         Ball ball;
+
         public BreakoutView(Context context) {
 
             super(context);
+
+            Display display = getWindowManager().getDefaultDisplay();
+            size = new Point();
+            display.getSize(size);
+
+            sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            sensorManager.registerListener(this, accelerometer, sensorManager.SENSOR_DELAY_GAME);
+            proximity = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+            sensorManager.registerListener(this, proximity, sensorManager.SENSOR_DELAY_GAME);
+
             ourHolder = getHolder();
             paint = new Paint();
-            Display display = getWindowManager().getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
 
@@ -159,10 +156,7 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
         }
 
         private void dibujarBricks() {
-            //El diseño y la forma de aparecer de estos ladrillos
-            //es particular de este nivel actual, 5 columnas y 6 filas
-            // Sin gap entre ladrillo y ladrillo. Se veran como una linea unica de ladrillos.
-            //como lo hacia la antigua Atari
+            //mejorar este desastre
             paint.setColor(Color.argb(255,  123, 212, 111));
             for(int i = 0; i < numBricks; i++){
                 if(bricks[i].getVisibility()) {
@@ -195,6 +189,17 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
             }
         }
 
+        private void dibujarBullets() {
+            paint.setColor(Color.argb(255, 123, 212, 111));
+            for (Bullet b : bullets){
+                if (b.shouldMove()) {
+                    paint.setColor(Color.argb(255, 204, 71, 72));
+                    canvas.drawRect(b.getRect(), paint);
+                }
+            }
+        }
+
+
         public void createBricksAndRestart(){
             ball.reset();
 
@@ -211,6 +216,9 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
                     numBricks ++;
                 }
             }
+
+            bullets.clear();
+            spawnedBullets=0;
             if (lives == 0) {
                 score = 0;
                 lives = 3;
@@ -232,7 +240,15 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
                 deltaF += (currentTime - initialTime) / timeF;
                 initialTime = currentTime;
 
+
+                System.out.println("CONTAOR_ "+cooldown_counter);
                 if (deltaF >= 1 && !paused) {
+
+                    cooldown_counter += (float)deltaF/100;
+                    if(cooldown_counter <= 0){
+                        cooldown_counter = GameGlobalData.bullet_cooldown;
+                    }
+
                     update((float)deltaF/1000);//lo convierto a milisegundos
                     frames++;
                     deltaF--;
@@ -310,6 +326,23 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
                     }
                 }
             }
+            //Colision con Bullet-Brick
+            for(int i = 0; i < bullets.size(); i++) {
+                for(int j = 0; j < numBricks; j++){
+                    if (bricks[i].getVisibility() && Rect.intersects(bricks[j].getRect(), bullets.get(i).getRect())){
+                        bullets.get(i).eliminarBullet();
+                        bricks[j].setInvisible();
+                        soundPool.play(explode_id, 1, 1, 0, 0, 1);
+                        score = score + 10;
+                    }
+
+                }
+            }
+            for (Bullet b : bullets){
+                if(b.shouldMove()){
+                    b.stepDY();
+                }
+            }
 
             //Ball choca contra el suelo
             if( ball.getRect().bottom > screenHeight-ball.getRect().height() ){
@@ -354,7 +387,9 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
                 dibujarBricks();
                 dibujarScore();
+                dibujarBullets();
                 dibujarCondicionDeVictoria();
+
 
                 ourHolder.unlockCanvasAndPost(canvas);
             }
@@ -362,7 +397,6 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
         }
 
         private void dibujarCondicionDeVictoria() {
-
             if(score == numBricks * 10){
                 paint.setTextSize(90);
                 paint.setColor(Color.RED);
@@ -449,15 +483,17 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
                 @Override
                 public void onResponse(Call<Respuesta_RegistrarEvento> call, Response<Respuesta_RegistrarEvento> response) {
-                    if(response.isSuccessful()){
-                        //if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
-                        System.out.println("ENVIAR EVENTO Colision DIO SUCCESS");
+                    if(response.isSuccessful()) {
+                        if (response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")) {
+                            System.out.println("ENVIAR EVENTO Colision DIO SUCCESS");
+                        }
                     }
 
                     if(!response.isSuccessful()){
-                        //if(response == null || response.body() == null || response.body().getState().equals("error")){
-                        if(response.body().getState().equals("error")) {
-                            System.out.println("ENVIAR EVENTO Colision DIO ERROR");
+                        if(response == null || response.body() == null || response.body().getState().equals("error")) {
+
+                                System.out.println("ENVIAR EVENTO Colision DIO ERROR");
+
                         }
                     }
                 }
@@ -471,7 +507,6 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
 
             });
         }
-
         void registrarFinDelJuego (){
 
             SharedPreferences sp = getSharedPreferences(GameGlobalData.preferenciasLogs, MODE_PRIVATE);
@@ -519,8 +554,7 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
                     }
 
                     if(!response.isSuccessful()){
-                        //if(response == null || response.body() == null || response.body().getState().equals("error")){
-                        if(response.body().getState().equals("error")) {
+                        if(response == null || response.body() == null || response.body().getState().equals("error")) {
                             System.out.println("ENVIAR EVENTO FIN Juego DIO ERROR");
                         }
                     }
@@ -536,6 +570,40 @@ public class GameLoop extends AppCompatActivity implements SensorEventListener {
             });
         }
 
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+
+            if( event.sensor.getType() == Sensor.TYPE_PROXIMITY)
+            {
+                if (event.values[0] <= 0.09f) {
+                    System.out.println("PRIMERO");
+                    if(cooldown_counter > GameGlobalData.bullet_cooldown) {
+                        System.out.println("SEGUNDO "+cooldown_counter);
+                        Bullet b = new Bullet(screenWidth, screenHeight, paddle.LEFT);
+                        b.setShouldMove(true);
+                        bullets.add(b);
+                        cooldown_counter = 0;
+                    }
+
+
+                }
+            }
+            if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                if (paddle != null && event.values[0] > 0.7f && paddle.getRect().left > 0) {//inclinado a izquierda
+                    paddle.setMovementState(paddle.LEFT);
+                } else if (paddle != null && event.values[0] < -0.7f && (paddle.getRect().left + paddle.getRect().width()) < size.x) {//inclinado a derecha
+                    paddle.setMovementState(paddle.RIGHT);
+                } else {
+                    paddle.setMovementState(paddle.STOPPED);
+                }
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
 
     }
 

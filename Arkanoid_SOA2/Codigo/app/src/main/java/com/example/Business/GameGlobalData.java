@@ -9,4 +9,5 @@ public class GameGlobalData {
     public final static String urlBase="http://so-unlam.net.ar/api/api/";
     public final static int timeout =950;
     public final static boolean limpiarLogs=true;
+    public final static int bullet_cooldown = 2; //seg
 }
