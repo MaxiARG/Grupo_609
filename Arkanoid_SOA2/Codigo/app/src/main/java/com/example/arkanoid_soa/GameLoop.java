@@ -235,7 +235,7 @@ public class GameLoop extends AppCompatActivity {
 
                 if (deltaF >= 1 && !paused) {
                     cooldown_counter += (float)deltaF/100;
-                    if(cooldown_counter <= 0)
+                    if(cooldown_counter <= 0.09f)
                         cooldown_counter = GameGlobalData.bullet_cooldown;
                     update((float)deltaF/1000);//lo convierto a milisegundos
                     deltaF--;
@@ -261,21 +261,25 @@ public class GameLoop extends AppCompatActivity {
             checkear_Colision_PaddleBall_Y(); //Colision con Paddle al moverse en Y
             checkear_Colision_BallBrick_Y();//Colision con Bricks al moverse en Y
 
-            //Colision con Bullet-Brick
-            for(int i = 0; i < bullets.size(); i++) {
-                for(int j = 0; j < numBricks; j++){
-                    if (bricks[i].getVisibility() && Rect.intersects(bricks[j].getRect(), bullets.get(i).getRect())){
-                        bullets.get(i).eliminarBullet();
-                        bricks[j].setInvisible();
-                        soundPool.play(explode_id, 1, 1, 0, 0, 1);
-                        score = score + 10;
-                    }
 
-                }
-            }
+            checkear_Colision_BulletBrick(); //Colision con Bullet-Brick
+
             moverUnStep_Bullets();
             checkear_Colision_BallSuelo();
             verificar_CondicionDeVictoria();
+        }
+
+        private void checkear_Colision_BulletBrick() {
+            for (Bullet b : bullets){
+                for(int i = 0; i<numBricks; i++){
+                    if (bricks[i].getVisibility() && Rect.intersects(bricks[i].getRect(), b.getRect())){
+                        bullets.remove(b);
+                        bricks[i].setInvisible();
+                        soundPool.play(explode_id, 1, 1, 0, 0, 1);
+                        score = score + 10;
+                    }
+                }
+            }
         }
 
         private void moverUnStep_Bullets() {
@@ -437,7 +441,7 @@ public class GameLoop extends AppCompatActivity {
         private void dibujarScore() {
             paint.setColor(Color.argb(255,  255, 255, 255));
             paint.setTextSize(40);
-            canvas.drawText("Puntaje: " + score + "   Vidas: " + lives, 10,50, paint);
+            canvas.drawText("Puntaje: " + score + "   Vidas: " + lives+" Disparos: "+ spawnedBullets, 10,50, paint);
         }
 
         public void pause() {
@@ -473,12 +477,11 @@ public class GameLoop extends AppCompatActivity {
             if( event.sensor.getType() == Sensor.TYPE_PROXIMITY)
             {
                 if (event.values[0] <= 0.09f) {
-                    System.out.println("PRIMERO");
-                    if(cooldown_counter > GameGlobalData.bullet_cooldown) {
-                        System.out.println("********** DISPARAAAAAR **************"+cooldown_counter);
+                    if(cooldown_counter > GameGlobalData.bullet_cooldown && spawnedBullets<max_bullet_count) {
                         Bullet b = new Bullet(screenWidth, screenHeight, paddle.LEFT);
                         b.setShouldMove(true);
                         bullets.add(b);
+                        spawnedBullets++;
                         cooldown_counter = 0;
                     }
 

@@ -26,7 +26,7 @@ public class GameGlobalData {
     public final static int Cantidad_Maxima_De_Registros=90;
     public final static String urlBase="http://so-unlam.net.ar/api/api/";
     public final static int timeout =950;
-    public final static int bullet_cooldown = 2; //seg
+    public final static int bullet_cooldown = 4; //seg
 
     public static String fechaHora(){
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
@@ -38,6 +38,11 @@ public class GameGlobalData {
     public static void guardarEvento(Context context, String key, String value){
         SharedPreferences sp = context.getSharedPreferences(GameGlobalData.preferenciasLogs, context.MODE_PRIVATE);
         SharedPreferences.Editor editorSP = sp.edit();
+
+        if(sp.getAll().size()>=Cantidad_Maxima_De_Registros){
+            editorSP.clear();
+            editorSP.apply();
+        }
 
         editorSP.putString(key, value);
         editorSP.apply();

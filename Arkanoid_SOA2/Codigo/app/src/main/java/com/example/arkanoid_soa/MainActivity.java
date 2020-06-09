@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.OkHttpClient;
 import okhttp3.OkHttpClient.Builder;
@@ -58,11 +60,22 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean validarMailPass(EditText email, EditText password){
             boolean esValido = true;
+            //para validar email.
+            String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+            Pattern pattern = Pattern.compile(regex);
+
             String m = email.getText().toString().trim();
             String p = password.getText().toString().trim();
-            if(m==null || m.length() == 0 || m.equals("")){
+            if(m==null || m.length() < 5 || m.equals("")){ //4 porque un email tiene minimo 5 caracteres: A@B.c
                 email.setText("Este Campo No Puede Estar Vacio");
                 esValido=false;
+            }
+            if(m!=null && m.length()>=5){
+                Matcher matcher = pattern.matcher(m);
+                if(!matcher.matches()){
+                    email.setText("Formato email invalido");
+                    esValido=false;
+                }
             }
             if(p==null || p.length() == 0 || p.equals("")){
                 password.setText("Este Campo No Puede Estar Vacio");
@@ -72,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                 password.setText("El Password Debe Tener Almenos 8 Caracteres");
                 esValido=false;
             }
-            //Validar con regex formato de mail.
+
             return esValido;
     }
 

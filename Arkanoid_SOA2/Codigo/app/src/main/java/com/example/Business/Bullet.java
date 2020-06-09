@@ -43,7 +43,8 @@ public class Bullet {
     public boolean shouldMove(){return shouldMove;}
 
     public void eliminarBullet(){
-        rect = new Rect(-8000,-8000, 8000 + ancho, 8000 + alto);
         shouldMove = false;
+        rect = new Rect(-8000,-8000, 8000 + ancho, 8000 + alto);
+
     }
 }

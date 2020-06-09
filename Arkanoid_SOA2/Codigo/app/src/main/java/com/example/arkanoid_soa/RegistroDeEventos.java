@@ -25,22 +25,14 @@ public class RegistroDeEventos extends AppCompatActivity {
     }
 
     void cargarScrollViewConLogs (){
-
         SharedPreferences sp = getSharedPreferences(GameGlobalData.preferenciasLogs, MODE_PRIVATE);
-       // SharedPreferences.Editor editorSP = sp.edit();
         textView = (TextView)findViewById(R.id.textViewLogs);
-        //editText.getText();
         textView.setText("");
         textView.setText("\nEventros Registrados:\n");
         Map<String, ?> allEntries = sp.getAll();
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
             textView.append(entry.getKey()+": "+entry.getValue().toString());
         }
-
-      //  editorSP.putString("ASD","asd");
-     //   editorSP.apply();//para guardar los cambios
-
-        //String obtenido = sp.getString("ASD", "ValorPorDefectoSiNoEncuentroNada");
     }
 
 
@@ -50,9 +42,6 @@ public class RegistroDeEventos extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        return;
-    }
-
+    public void onBackPressed() {}
 
 }
