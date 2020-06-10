@@ -18,10 +18,10 @@ public class Paddle {
 
     private int paddleMoving = STOPPED;
 
-    int screenWidth;
-    int screenHeight;
-    int posInicialX;
-    int posInicialY;
+    private int screenWidth;
+    private int screenHeight;
+    private int posInicialX;
+    private int posInicialY;
 
     public Paddle(int screenX, int screenY){
         // Tam en pixeles del Paddle
@@ -30,7 +30,7 @@ public class Paddle {
         screenHeight=screenY;
         screenWidth = screenX;
         //0.5 es el 50% del ancho de la pantalla
-        //0.8 es el 80% del alto. Ambos para posicionar el paddle bien
+        //0.8 es el 80% del alto. Ambos para posicionar el paddle bien, pensando en pantallas de variadas dimensiones.
         posInicialX = Math.round(screenWidth * 0.5f - ancho/2);;
         posInicialY = Math.round(screenHeight * 0.8f);
 

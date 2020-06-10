@@ -1,7 +1,6 @@
 package com.example.Business;
 
 import android.graphics.Rect;
-import android.graphics.RectF;
 
 public class Brick {
     private Rect rect;
