@@ -272,11 +272,12 @@ public class GameLoop extends AppCompatActivity {
         }
 
         private void  checkear_Colision_BulletBrick()  {
-            for (Iterator<Bullet> iterator = bullets.iterator(); iterator.hasNext();) {
-                Bullet b = iterator.next();
+
+            for (Iterator<Bullet> it = bullets.iterator(); it.hasNext();) {
+                Bullet b = it.next();
                 for(int i = 0; i<numBricks; i++){
-                    if (bricks[i].getVisibility() && Rect.intersects(bricks[i].getRect(), b.getRect())){
-                        iterator.remove();
+                    if (bricks[i].getVisibility() && Rect.intersects(bricks[i].getRect(),  b.getRect())){
+                        b.eliminarBullet();
                         bricks[i].setInvisible();
                         soundPool.play(explode_id, 1, 1, 0, 0, 1);
                         score = score + 10;
@@ -445,7 +446,7 @@ public class GameLoop extends AppCompatActivity {
         private void dibujarScore() {
             paint.setColor(Color.argb(255,  255, 255, 255));
             paint.setTextSize(40);
-            canvas.drawText("Puntaje: " + score + "   Vidas: " + lives+" Disparos: "+ spawnedBullets, 10,50, paint);
+            canvas.drawText("Puntaje: " + score + "   Vidas: " + lives+" Disparos: "+ (max_bullet_count - spawnedBullets), 10,50, paint);
         }
 
         public void pause() {
@@ -482,7 +483,7 @@ public class GameLoop extends AppCompatActivity {
             {
                 if (event.values[0] <= 0.09f) {
                     if(cooldown_counter <= 0.09f && spawnedBullets<max_bullet_count) {
-                        Bullet b = new Bullet(screenWidth, screenHeight, paddle.LEFT);
+                        Bullet b = new Bullet(screenWidth, screenHeight, paddle.getRect().left);
                         b.setShouldMove(true);
                         bullets.add(b);
                         spawnedBullets++;

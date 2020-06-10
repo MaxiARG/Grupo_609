@@ -7,7 +7,7 @@ import java.util.Random;
 public class Bullet {
 
     private Rect rect;//sirve para ver colisiones
-    private int dy = -1;
+    private int dy = -3;
     // ancho NO es relativo a 'left' sino, es la coord global donde esta la anchura
     private int ancho = 40;
     private int alto = 40;
@@ -45,7 +45,8 @@ public class Bullet {
 
     public void eliminarBullet(){
         shouldMove = false;
-        rect = new Rect(-8000,-8000, 8000 + ancho, 8000 + alto);
+        rect = new Rect(-8000,-8000, -8000 + ancho, -8000 + alto);
+        dy = 0;
 
     }
 }
