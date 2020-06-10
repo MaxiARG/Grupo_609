@@ -82,14 +82,14 @@ public class GameLoop extends AppCompatActivity {
         int spawnedBullets =0;
         List<Bullet> bullets = new ArrayList<Bullet>(max_bullet_count);
         float cooldown_counter = 0;
-        /////////
+
         Thread gameThread = null;
         SurfaceHolder ourHolder;
         boolean paused = true;
         Canvas canvas;
         Paint paint;
-        //
-        Brick[] bricks = new Brick[200];//cambiar esto por una matriz asi lo pinto mas facil?
+
+        Brick[] bricks = new Brick[200];
         int numBricks = 0;
         int brickWidth ;
         int alturaDeCadaBrick=75;
@@ -187,10 +187,10 @@ public class GameLoop extends AppCompatActivity {
         }
 
         private void dibujarBullets() {
-            paint.setColor(Color.argb(255, 123, 212, 111));
+
             for (Bullet b : bullets){
                 if (b.shouldMove()) {
-                    paint.setColor(Color.argb(255, 204, 71, 72));
+                    paint.setColor(Color.argb(255, 51, 102, 0));
                     canvas.drawRect(b.getRect(), paint);
                 }
             }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.arkanoid_soa">
 
     <uses-permission
@@ -14,21 +15,23 @@
     <application
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
+
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".RegistroDeEventos"></activity>
-        <activity android:name=".ErrorDeAutenticacion" />
-        <activity android:name=".RegistroExitoso" />
-        <activity android:name=".Perdiste_Activity" />
-        <activity android:name=".Ganaste_Activity" />
-        <activity android:name=".GameLoop" />
-        <activity android:name=".MainMenu_Activity" />
-        <activity android:name=".Registrarse_Activity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".RegistroDeEventos" android:screenOrientation="portrait" tools:ignore="LockedOrientationActivity" />
+        <activity android:name=".ErrorDeAutenticacion" android:screenOrientation="portrait" tools:ignore="LockedOrientationActivity"/>
+        <activity android:name=".RegistroExitoso" android:screenOrientation="portrait" tools:ignore="LockedOrientationActivity"/>
+        <activity android:name=".Perdiste_Activity" android:screenOrientation="portrait" tools:ignore="LockedOrientationActivity"/>
+        <activity android:name=".Ganaste_Activity" android:screenOrientation="portrait" tools:ignore="LockedOrientationActivity"/>
+        <activity android:name=".GameLoop" android:screenOrientation="portrait" tools:ignore="LockedOrientationActivity"/>
+        <activity android:name=".MainMenu_Activity" android:screenOrientation="portrait" tools:ignore="LockedOrientationActivity"/>
+        <activity android:name=".Registrarse_Activity" android:screenOrientation="portrait" tools:ignore="LockedOrientationActivity"/>
+        <activity android:name=".MainActivity" android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
