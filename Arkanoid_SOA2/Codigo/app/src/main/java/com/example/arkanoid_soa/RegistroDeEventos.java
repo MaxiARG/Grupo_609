@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.example.Business.GameGlobalData;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 public class RegistroDeEventos extends AppCompatActivity {
 
@@ -30,18 +31,18 @@ public class RegistroDeEventos extends AppCompatActivity {
         textView.setText("");
         textView.setText("\nEventros Registrados:\n");
         Map<String, ?> allEntries = sp.getAll();
+
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            System.out.println(entry.getKey());
             textView.append(entry.getKey()+": "+entry.getValue().toString());
         }
     }
 
 
     public void A_MenuPrincipal(View view){
-        Intent intent = new Intent(this, MainMenu_Activity.class);
-        startActivity(intent);
+      GameGlobalData.limpiarLogs(getBaseContext());
+      cargarScrollViewConLogs();
     }
 
-    @Override
-    public void onBackPressed() {}
 
 }
