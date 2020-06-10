@@ -67,22 +67,22 @@ public class MainActivity extends AppCompatActivity {
             String m = email.getText().toString().trim();
             String p = password.getText().toString().trim();
             if(m==null || m.length() < 5 || m.equals("")){ //4 porque un email tiene minimo 5 caracteres: A@B.c
-                email.setText("Este Campo No Puede Estar Vacio");
+                email.setHint("Este Campo No Puede Estar Vacio");
                 esValido=false;
             }
             if(m!=null && m.length()>=5){
                 Matcher matcher = pattern.matcher(m);
                 if(!matcher.matches()){
-                    email.setText("Formato email invalido");
+                    email.setHint("Formato email invalido");
                     esValido=false;
                 }
             }
             if(p==null || p.length() == 0 || p.equals("")){
-                password.setText("Este Campo No Puede Estar Vacio");
+                password.setHint("Este Campo No Puede Estar Vacio");
                 esValido=false;
             }
             if(p!=null && !p.equals("") && p.length() <8 ){
-                password.setText("El Password Debe Tener Almenos 8 Caracteres");
+                password.setHint("El Password Debe Tener Almenos 8 Caracteres");
                 esValido=false;
             }
 
@@ -121,11 +121,11 @@ public class MainActivity extends AppCompatActivity {
 
                     if(response.isSuccessful()){
                         if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
-                           // startService(new Intent(getApplicationContext(), ServicioMusica.class));
-                            GameGlobalData.limpiarLogs(getBaseContext());
+                            startService(new Intent(getApplicationContext(), ServicioMusica.class));
+                              GameGlobalData.limpiarLogs(getBaseContext());
                             GameGlobalData.token =  response.body().getToken();
                             GameGlobalData.guardarEvento(getBaseContext(),GameGlobalData.fechaHora(),"Login Exitoso\n");
-                            GameGlobalData.enviarEvento("LOGIN", "Usuario se loguea al sistema");
+                            GameGlobalData.enviarEvento(getBaseContext(), "LOGIN", "Usuario se loguea al sistema");
 
                             Intent intent = new Intent( getBaseContext() , MainMenu_Activity.class);
                             startActivity(intent);
@@ -140,15 +140,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 @Override
                 public void onFailure(Call<Respuesta_Webservice> call, Throwable t) {
-                    System.out.println(t.getMessage());
+                    GameGlobalData.guardarEvento(getBaseContext(),GameGlobalData.fechaHora(),"Sin Conexion\n");
                     Toast.makeText(getBaseContext(), "Revise su conexion o vuelva a intentarlo", Toast.LENGTH_LONG).show();
                 }
             });
         }else{
             email.setText("");
-            email.setHint("Mail invalido");
             password.setText("");
-            password.setHint("Password invalido");
             Toast.makeText(getBaseContext(), "Credenciales Incorrectas", Toast.LENGTH_LONG).show();
         }
 

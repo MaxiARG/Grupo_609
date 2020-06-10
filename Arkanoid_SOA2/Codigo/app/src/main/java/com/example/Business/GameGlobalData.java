@@ -2,6 +2,7 @@ package com.example.Business;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 import com.example.servicios.Body_Evento;
 import com.example.servicios.Respuesta_RegistrarEvento;
@@ -26,7 +27,7 @@ public class GameGlobalData {
     public final static int Cantidad_Maxima_De_Registros=90;
     public final static String urlBase="http://so-unlam.net.ar/api/api/";
     public final static int timeout =950;
-    public final static int bullet_cooldown = 4; //seg
+    public final static int bullet_cooldown = 2; //seg
 
     public static String fechaHora(){
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
@@ -52,11 +53,10 @@ public class GameGlobalData {
         SharedPreferences sp = context.getSharedPreferences(GameGlobalData.preferenciasLogs, context.MODE_PRIVATE);
         SharedPreferences.Editor editorSP = sp.edit();
         editorSP.clear();
-        editorSP.commit();
         editorSP.apply();
     }
 
-    public static void enviarEvento(String tipoEvento, String descripcion){
+    public static void enviarEvento(Context context, String tipoEvento, String descripcion){
         //El TOKEN ya esta escrito abajo. No se necesita pasar como parametro.
         Body_Evento be = new Body_Evento();
         be.setEnv("DEV");
@@ -80,23 +80,16 @@ public class GameGlobalData {
 
             @Override
             public void onResponse(Call<Respuesta_RegistrarEvento> call, Response<Respuesta_RegistrarEvento> response) {
-                System.out.println("OnResponse de EnviarEvento");
-                //System.out.println(response.body().toString());
-                if(response.isSuccessful()) {
-                    if (response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")) {
-                        System.out.println("ENVIAR EVENTO LOGIN DIO SUCCESS en GameGlobalData: "+ response.code());
-                    }
-                }
-
                 if(!response.isSuccessful()){
-                    System.out.println("OnResponse dio Not Successful: "+ response.code());
+                    System.out.println("FRACASO WS: "+ tipoEvento+" "+descripcion);
+                    GameGlobalData.guardarEvento(context ,"Repuesta 404: "+tipoEvento , descripcion);
                 }
             }
 
             @Override
             public void onFailure(Call<Respuesta_RegistrarEvento> call, Throwable t) {
-                System.out.println("*********************************** SALIO POR ON FAILURE");
-                System.out.println(t.getMessage()+": "+call.toString());
+                GameGlobalData.guardarEvento(context ,"Fallo Evento: "+tipoEvento , "Sin Conexion");
+                Toast.makeText(context,"Verifique su conexion a internet",Toast.LENGTH_LONG).show();
             }
 
         });

@@ -14,6 +14,9 @@ import com.example.servicios.Body_registrarse;
 import com.example.servicios.Respuesta_Webservice;
 import com.example.servicios.Webservice_UNLAM;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -53,12 +56,9 @@ public class Registrarse_Activity extends AppCompatActivity {
         String grupo = inputGroup.getText().toString().trim();
         String comision = inputComision.getText().toString().trim();
 
-        todoOK = NotEmpty(nombre) && NotEmpty(apellido) && NotEmpty(email) && NotEmpty(pass)
-                && NotEmpty(dni) && NotEmpty(grupo) && NotEmpty(comision);
-
-        todoOK = todoOK && pass.length() >= 8 && nombre.length() >= 3 && apellido.length() >= 3 && dni.length() >= 7;
-        todoOK = todoOK && grupo.length() == 3 && comision.length() >= 4;
-
+        todoOK = todoOK && validarMail(inputEmail) && validarPassword(inputPassword);
+        todoOK = todoOK && validarString(inputNombre) && validarString(inputApellido) && validarString(inputComision);
+        todoOK = todoOK && validarString(inputDNI) && validarString(inputGroup);
 
         if (todoOK) {
             info.setText("");
@@ -102,10 +102,9 @@ public class Registrarse_Activity extends AppCompatActivity {
 
                     if (response != null) {
                         if (response.body() != null && response.body().getState() != null && response.body().getState().equals("success")) {
-                            System.out.println(response.body().getState());
                             String token = response.body().getToken();
                             GameGlobalData.token = token;
-                            System.out.println(GameGlobalData.token);
+
                             Intent intent = new Intent(getBaseContext(), RegistroExitoso.class);
                             startActivity(intent);
                         }
@@ -120,8 +119,7 @@ public class Registrarse_Activity extends AppCompatActivity {
                 }
             });
 
-        }else if (todoOK == false) {
-            System.out.println("DATOS NOOOOOO CORRECTOS PARA ENVIAR");
+        }else if (!todoOK) {
             info.setText("");
             info.setText("Los Datos ingresados son Invalidos.");
             todoOK = true;
@@ -136,10 +134,52 @@ public class Registrarse_Activity extends AppCompatActivity {
 
     }
 
-    private boolean NotEmpty (String s){
-        if (s != null || s.trim().length() > 0)
-            return true;
-        return false;
+    private boolean validarString(EditText e){
+        boolean esValido = true;
+        String p = e.getText().toString().trim();
+        if(p==null || p.length() == 0 || p.equals("")){
+            e.setHint("Este Campo No Puede Estar Vacio");
+            esValido=false;
+        }
+        return esValido;
+    }
+
+
+    private boolean validarPassword(EditText e){
+        boolean esValido = true;
+        String p = e.getText().toString().trim();
+        if(p==null || p.length() == 0 || p.equals("")){
+            e.setHint("Este Campo No Puede Estar Vacio");
+            esValido=false;
+        }
+        if(p!=null && !p.equals("") && p.length() <8 ){
+            e.setHint("El Password Debe Tener Almenos 8 Caracteres");
+            esValido=false;
+        }
+        return esValido;
+
+    }
+
+    private boolean validarMail(EditText email){
+        boolean esValido = true;
+        //para validar email.
+        String regex = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+        Pattern pattern = Pattern.compile(regex);
+
+        String m = email.getText().toString().trim();
+
+        if(m==null || m.length() < 5 || m.equals("")){ //4 porque un email tiene minimo 5 caracteres: A@B.c
+            email.setHint("Este Campo No Puede Estar Vacio");
+            esValido=false;
+        }
+        if(m!=null && m.length()>=5){
+            Matcher matcher = pattern.matcher(m);
+            if(!matcher.matches()){
+                email.setHint("Formato email invalido");
+                esValido=false;
+            }
+        }
+        return esValido;
     }
 
 

@@ -18,6 +18,7 @@ public class Bullet {
 
     public Bullet(int screenX, int screenY, float posicionXdelPad){
         //Rect(int left, int top, int right, int bottom)
+        System.out.println("+++++++++++ "+posicionXdelPad);
         int posInicialX = Math.round(posicionXdelPad);
         int posInicialY = Math.round(screenY * 0.7f);
         rect  = new Rect(posInicialX, posInicialY, posInicialX + ancho, posInicialY + alto);

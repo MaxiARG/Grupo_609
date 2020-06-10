@@ -36,6 +36,7 @@ import com.example.servicios.Webservice_UNLAM;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -214,6 +215,7 @@ public class GameLoop extends AppCompatActivity {
             }
 
             bullets.clear();
+            cooldown_counter = GameGlobalData.bullet_cooldown;
             spawnedBullets=0;
             score = 0;
             lives = 3;
@@ -234,10 +236,10 @@ public class GameLoop extends AppCompatActivity {
                 initialTime = currentTime;
 
                 if (deltaF >= 1 && !paused) {
-                    cooldown_counter += (float)deltaF/100;
+                    cooldown_counter -= (float)deltaF/100;
                     if(cooldown_counter <= 0.09f)
-                        cooldown_counter = GameGlobalData.bullet_cooldown;
-                    update((float)deltaF/1000);//lo convierto a milisegundos
+                        cooldown_counter=0;
+                    update((float)deltaF/100);//lo convierto a milisegundos
                     deltaF--;
                 }
                 draw();
@@ -269,11 +271,12 @@ public class GameLoop extends AppCompatActivity {
             verificar_CondicionDeVictoria();
         }
 
-        private void checkear_Colision_BulletBrick() {
-            for (Bullet b : bullets){
+        private void  checkear_Colision_BulletBrick()  {
+            for (Iterator<Bullet> iterator = bullets.iterator(); iterator.hasNext();) {
+                Bullet b = iterator.next();
                 for(int i = 0; i<numBricks; i++){
                     if (bricks[i].getVisibility() && Rect.intersects(bricks[i].getRect(), b.getRect())){
-                        bullets.remove(b);
+                        iterator.remove();
                         bricks[i].setInvisible();
                         soundPool.play(explode_id, 1, 1, 0, 0, 1);
                         score = score + 10;
@@ -296,7 +299,7 @@ public class GameLoop extends AppCompatActivity {
                 soundPool.play(win_id, 1, 1, 0, 0, 1);
                 paddle.resetPosition();
                 GameGlobalData.guardarEvento(getBaseContext() ,GameGlobalData.fechaHora(), "Fin del Juego. GANASTE\n");
-                GameGlobalData.enviarEvento("Fin-Juego", "El Jugador ah GANADO");
+                GameGlobalData.enviarEvento(getBaseContext(), "Fin-Juego", "El Jugador ah GANADO");
 
                 createBricksAndRestart();
 
@@ -317,6 +320,7 @@ public class GameLoop extends AppCompatActivity {
             if(Rect.intersects(paddle.getRect(), ball.getRect())){
                 soundPool.play(beep2_id, 1, 1, 0, 0, 1);
                 ball.stepBackDX();
+                ball.invertirDX();
                 ball.randomizeDY();
             }
         }
@@ -376,7 +380,7 @@ public class GameLoop extends AppCompatActivity {
                 ball.reset();
                 paddle.resetPosition();
                 GameGlobalData.guardarEvento(getBaseContext() ,GameGlobalData.fechaHora(), "Pierde 1 Vida\n");
-                GameGlobalData.enviarEvento("Pierde-Vida", "Pierde 1 Vida");
+                GameGlobalData.enviarEvento(getBaseContext(), "Pierde-Vida", "Pierde 1 Vida");
 
                 verificar_SinVidasRestantes();
             }
@@ -389,7 +393,7 @@ public class GameLoop extends AppCompatActivity {
                 soundPool.play(explode_id, 1, 1, 0, 0, 1);
 
                 GameGlobalData.guardarEvento(getBaseContext() ,GameGlobalData.fechaHora(), "Fin del Juego. Perdio\n");
-                GameGlobalData.enviarEvento("Fin-Juego", "El Jugador Perdio Todas Sus Vidas");
+                GameGlobalData.enviarEvento(getBaseContext(), "Fin-Juego", "El Jugador Perdio Todas Sus Vidas");
 
                 Intent intent = new Intent(this.getContext() , Perdiste_Activity.class );
                 startActivity(intent);
@@ -424,16 +428,16 @@ public class GameLoop extends AppCompatActivity {
             if(score == numBricks * 10){
                 paint.setTextSize(90);
                 paint.setColor(Color.RED);
-                GameGlobalData.guardarEvento(getContext() , GameGlobalData.fechaHora(),"Victoria");
-                GameGlobalData.enviarEvento("Fin-Juego", "El jugador Ha Ganado");
+                GameGlobalData.guardarEvento(getContext() , GameGlobalData.fechaHora(),"Victoria Ganaste!\n");
+                GameGlobalData.enviarEvento(getBaseContext(), "Fin-Juego", "El jugador Ha Ganado");
                 canvas.drawText("VICTORIA!", screenWidth / 2,screenHeight / 2, paint);
             }
 
             if(lives <= 0){
                 paint.setTextSize(90);
                 paint.setColor(Color.RED);
-                GameGlobalData.guardarEvento(getContext() , GameGlobalData.fechaHora(),"Victoria");
-                GameGlobalData.enviarEvento("Fin-Juego", "El jugador Ha Perdido");
+                GameGlobalData.guardarEvento(getContext() , GameGlobalData.fechaHora(),"Perdiste!\n");
+                GameGlobalData.enviarEvento(getBaseContext(), "Fin-Juego", "El jugador Ha Perdido");
                 canvas.drawText("PERDISTE!", screenWidth / 2,screenHeight / 2, paint);
             }
     }
@@ -477,12 +481,12 @@ public class GameLoop extends AppCompatActivity {
             if( event.sensor.getType() == Sensor.TYPE_PROXIMITY)
             {
                 if (event.values[0] <= 0.09f) {
-                    if(cooldown_counter > GameGlobalData.bullet_cooldown && spawnedBullets<max_bullet_count) {
+                    if(cooldown_counter <= 0.09f && spawnedBullets<max_bullet_count) {
                         Bullet b = new Bullet(screenWidth, screenHeight, paddle.LEFT);
                         b.setShouldMove(true);
                         bullets.add(b);
                         spawnedBullets++;
-                        cooldown_counter = 0;
+                        cooldown_counter = GameGlobalData.bullet_cooldown;
                     }
 
                 }

@@ -36,8 +36,8 @@ public class MainMenu_Activity extends AppCompatActivity {
 
     }
     public void StartGameButton(View view){
-        GameGlobalData.guardarEvento(getBaseContext(), GameGlobalData.fechaHora(), "Inicia Juego");
-        GameGlobalData.enviarEvento("Inicia-Juego", "El juego ha comenzado");
+        GameGlobalData.guardarEvento(getBaseContext(), GameGlobalData.fechaHora(), "Inicia Juego\n");
+        GameGlobalData.enviarEvento(getBaseContext(), "Inicia-Juego", "El juego ha comenzado");
         Intent intent = new Intent(this, GameLoop.class);
         startActivity(intent);
     }
