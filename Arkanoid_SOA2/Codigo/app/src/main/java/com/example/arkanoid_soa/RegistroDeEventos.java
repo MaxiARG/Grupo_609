@@ -33,7 +33,6 @@ public class RegistroDeEventos extends AppCompatActivity {
         Map<String, ?> allEntries = sp.getAll();
 
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            System.out.println(entry.getKey());
             textView.append(entry.getKey()+": "+entry.getValue().toString());
         }
     }

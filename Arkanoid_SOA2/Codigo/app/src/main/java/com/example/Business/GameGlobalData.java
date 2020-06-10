@@ -81,7 +81,6 @@ public class GameGlobalData {
             @Override
             public void onResponse(Call<Respuesta_RegistrarEvento> call, Response<Respuesta_RegistrarEvento> response) {
                 if(!response.isSuccessful()){
-                    System.out.println("FRACASO WS: "+ tipoEvento+" "+descripcion);
                     GameGlobalData.guardarEvento(context ,"Repuesta 404: "+tipoEvento , descripcion);
                 }
             }
