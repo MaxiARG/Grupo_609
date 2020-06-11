@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                     if(response.isSuccessful()){
                         if(response != null && response.body() != null && response.body().getState() != null && response.body().getState().equals("success")){
                             startService(new Intent(getApplicationContext(), ServicioMusica.class));
-                              GameGlobalData.limpiarLogs(getBaseContext());
+                            //  GameGlobalData.limpiarLogs(getBaseContext());
                             GameGlobalData.token =  response.body().getToken();
                             GameGlobalData.guardarEvento(getBaseContext(),GameGlobalData.fechaHora(),"Login Exitoso\n");
                             GameGlobalData.enviarEvento(getBaseContext(), "LOGIN", "Usuario se loguea al sistema");
